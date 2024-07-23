@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myorchard/calibrate.dart';
 import 'package:myorchard/location.dart';
+import 'package:myorchard/selectMap.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-          body: Calibrate(),
+          body: PickerButt(),
         ),
     );
   }

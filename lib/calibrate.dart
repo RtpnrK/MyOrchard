@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class Calibrate extends StatefulWidget {
-  const Calibrate({super.key});
+  File? image;
+  Calibrate({super.key, this.image});
   @override
   CalibrateState createState() => CalibrateState();
 }
@@ -15,6 +18,7 @@ class CalibrateState extends State<Calibrate> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.image);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Calibrate"),
@@ -41,8 +45,10 @@ class CalibrateState extends State<Calibrate> {
                   },
                   child: Stack(
                     children: [
-                      Image.asset("assets/images/map1.png",
-                          fit: BoxFit.contain),
+                      widget.image != null
+                          ? Image.file(widget.image!,height: MediaQuery.of(context).size.height/2,width:MediaQuery.of(context).size.width ,)
+                          : Image.asset("assets/images/map1.png",
+                              fit: BoxFit.contain),
                       if (isPress)
                         Positioned(
                             left: imgOffset.dx - 10,
@@ -114,7 +120,6 @@ class CalibrateState extends State<Calibrate> {
             height: 20,
           ),
           Text(offsetShow),
-          
         ],
       )),
     );
