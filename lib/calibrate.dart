@@ -4,8 +4,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:myorchard/pin.dart';
 
 class Calibrate extends StatefulWidget {
-  File? image;
-  Calibrate({super.key, this.image});
+  final File? image;
+  const Calibrate({super.key, this.image});
   @override
   CalibrateState createState() => CalibrateState();
 }
@@ -71,7 +71,7 @@ class CalibrateState extends State<Calibrate> {
         title: const Text("Calibrate"),
         centerTitle: true,
       ),
-      endDrawer: Drawer(),
+      endDrawer: const Drawer(),
       body: Center(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
