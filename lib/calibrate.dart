@@ -17,9 +17,6 @@ class CalibrateState extends State<Calibrate> {
   bool isPress = false;
   bool isPin = false;
   Color pin = Colors.black;
-  bool pressedRed = false;
-  bool pressedGreen = false;
-  bool pressedBlue = false;
 
   String location = '';
 
