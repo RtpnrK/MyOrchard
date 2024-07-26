@@ -17,7 +17,6 @@ class _PickerButtState extends State<PickerButt> {
 
   Future<void> pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       setState(() {
         imagFile = File(pickedFile.path);

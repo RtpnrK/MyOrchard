@@ -14,15 +14,25 @@ class CalibrateState extends State<Calibrate> {
   Offset imgOffset = const Offset(0, 0);
   final Offset initOffset = const Offset(0, 0);
   String offsetShow = "";
+  String location = '';
   bool isPress = false;
   bool isPin = false;
-  String location = '';
   double lat = 0;
   double long = 0;
-  final double pinSize = 20;
+  final double pinSize = 100;
   Color pinColor = Colors.transparent;
   int index = 0;
   var currentPin = <int, Pin>{};
+  var pinDetail = <int, ExpansionTile>{};
+  final TransformationController _transformationController = TransformationController();
+
+  @override
+  void initState() {
+    super.initState();
+    // ตั้งค่า scale เริ่มต้น
+    _transformationController.value = Matrix4.identity()
+      ..scale(0.3); // กำหนดค่า scale
+  }
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled;
@@ -58,9 +68,11 @@ class CalibrateState extends State<Calibrate> {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     setState(() {
-      String lat = position.latitude.toStringAsFixed(10);
-      String long = position.longitude.toStringAsFixed(10);
-      location = 'Lat: $lat, Long: $long';
+      lat = position.latitude;
+      long = position.longitude;
+      String lx = lat.toStringAsFixed(10);
+      String ly = long.toStringAsFixed(10);
+      location = 'Lat: $lx, Long: $ly';
     });
   }
 
@@ -71,49 +83,70 @@ class CalibrateState extends State<Calibrate> {
         title: const Text("Calibrate"),
         centerTitle: true,
       ),
-      endDrawer: const Drawer(),
+      endDrawer: Drawer(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text("Pin Details"),
+                ...pinDetail.values
+              ],
+            ),
+          )),
+      ),
       body: Center(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          InteractiveViewer(
-            child: GestureDetector(
-              onTapDown: (details) {
-                setState(() {
-                  if (isPress) {
-                    imgOffset = details.localPosition;
-                    String dx = imgOffset.dx.toStringAsFixed(10);
-                    String dy = imgOffset.dy.toStringAsFixed(10);
-                    offsetShow = "Pixel Offset: $dx, $dy";
-                    isPin = true;
-                    if (currentPin.containsKey(index)) {
-                      currentPin.update(
-                          index,
-                          (value) => Pin(
-                              imgOffset: imgOffset,
-                              pinColor: pinColor,
-                              pinSize: pinSize));
-                      return;
+          Container(
+            margin: EdgeInsets.all(10),
+            width: 400,
+            height: 350,
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.black), color: Colors.black),
+            child: InteractiveViewer(
+              transformationController: _transformationController,
+              minScale: 0.1,
+              maxScale: 0.8,
+              constrained: false,
+              child: GestureDetector(
+                onTapDown: (details) {
+                  setState(() {
+                    if (isPress) {
+                      imgOffset = details.localPosition;
+                      String dx = (imgOffset.dx).toStringAsFixed(10);
+                      String dy = (imgOffset.dy).toStringAsFixed(10);
+                      offsetShow = "Pixel Offset: $dx, $dy";
+                      isPin = true;
+                      if (currentPin.containsKey(index)) {
+                        currentPin.update(
+                            index,
+                            (value) => Pin(
+                                imgOffset: imgOffset,
+                                pinColor: pinColor,
+                                pinSize: pinSize));
+                        return;
+                      }
+                      currentPin[index] = Pin(
+                          imgOffset: imgOffset,
+                          pinColor: pinColor,
+                          pinSize: pinSize);
                     }
-                    currentPin[index] = Pin(
-                        imgOffset: imgOffset,
-                        pinColor: pinColor,
-                        pinSize: pinSize);
-                  }
-                });
-              },
-              child: Stack(
-                children: [
-                  widget.image != null
-                      ? Image.file(
-                          widget.image!,
-                          height: MediaQuery.of(context).size.height / 2,
-                          width: MediaQuery.of(context).size.width,
-                        )
-                      : Image.asset("assets/images/map1.png",
-                          fit: BoxFit.contain),
-                  ...currentPin.values
-                ],
+                  });
+                },
+                child: Stack(
+                  children: [
+                    widget.image != null
+                        ? Center(
+                            child: Image.file(
+                              widget.image!,
+                            ),
+                          )
+                        : Image.asset("assets/images/map1.png",
+                            fit: BoxFit.contain),
+                    ...currentPin.values
+                  ],
+                ),
               ),
             ),
           ),
@@ -145,7 +178,11 @@ class CalibrateState extends State<Calibrate> {
                   child: OutlinedButton(
                       onPressed: isPin
                           ? () {
-                              _getCurrentLocation();
+                            setState(() {
+                               isPress = false;
+                            });
+                             _getCurrentLocation();
+                              updateDrawer();
                             }
                           : null,
                       child: const Text("Apply")))
@@ -210,5 +247,25 @@ class CalibrateState extends State<Calibrate> {
         ],
       )),
     );
+  }
+
+  void updateDrawer() {
+    pinDetail[index] = ExpansionTile(
+      title: Text("Pin"),
+      leading: Icon(Icons.location_pin, color: pinColor, size: 30,),
+      children: [
+        ListTile(
+          title: Text("Px: ${imgOffset.dx}"),
+        ),
+        ListTile(
+          title: Text("Py: ${imgOffset.dy}"),
+        ),
+        ListTile(
+          title: Text("Lat: $lat"),
+        ),
+        ListTile(
+          title: Text("Long: $long"),
+        ),
+      ],);
   }
 }
