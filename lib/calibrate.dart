@@ -24,7 +24,8 @@ class CalibrateState extends State<Calibrate> {
   int index = 0;
   var currentPin = <int, Pin>{};
   var pinDetail = <int, ExpansionTile>{};
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
 
   @override
   void initState() {
@@ -66,13 +67,15 @@ class CalibrateState extends State<Calibrate> {
     }
 
     Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high
+    );
     setState(() {
       lat = position.latitude;
       long = position.longitude;
       String lx = lat.toStringAsFixed(10);
       String ly = long.toStringAsFixed(10);
       location = 'Lat: $lx, Long: $ly';
+      updateDrawer();
     });
   }
 
@@ -80,19 +83,14 @@ class CalibrateState extends State<Calibrate> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Calibrate"),
-        centerTitle: true,
       ),
       endDrawer: Drawer(
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Text("Pin Details"),
-                ...pinDetail.values
-              ],
-            ),
-          )),
+            child: SingleChildScrollView(
+          child: Column(
+            children: [Text("Pin Details"), ...pinDetail.values],
+          ),
+        )),
       ),
       body: Center(
           child: Column(
@@ -178,11 +176,10 @@ class CalibrateState extends State<Calibrate> {
                   child: OutlinedButton(
                       onPressed: isPin
                           ? () {
-                            setState(() {
-                               isPress = false;
-                            });
-                             _getCurrentLocation();
-                              updateDrawer();
+                              setState(() {
+                                isPress = false;
+                              });
+                              _getCurrentLocation();
                             }
                           : null,
                       child: const Text("Apply")))
@@ -250,9 +247,13 @@ class CalibrateState extends State<Calibrate> {
   }
 
   void updateDrawer() {
-    pinDetail[index] = ExpansionTile(
+       pinDetail[index] = ExpansionTile(
       title: Text("Pin"),
-      leading: Icon(Icons.location_pin, color: pinColor, size: 30,),
+      leading: Icon(
+        Icons.location_pin,
+        color: pinColor,
+        size: 30,
+      ),
       children: [
         ListTile(
           title: Text("Px: ${imgOffset.dx}"),
@@ -266,6 +267,7 @@ class CalibrateState extends State<Calibrate> {
         ListTile(
           title: Text("Long: $long"),
         ),
-      ],);
+      ],
+    );
   }
 }
