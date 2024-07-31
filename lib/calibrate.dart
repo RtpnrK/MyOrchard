@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:myorchard/pin.dart';
+import 'package:myorchard/pinDetails.dart';
 
 class Calibrate extends StatefulWidget {
   final File? image;
@@ -12,18 +13,20 @@ class Calibrate extends StatefulWidget {
 
 class CalibrateState extends State<Calibrate> {
   Offset imgOffset = const Offset(0, 0);
-  final Offset initOffset = const Offset(0, 0);
+  Pin? oldPin;
   String offsetShow = "";
-  String location = '';
+  String location = "";
   bool isPress = false;
   bool isPin = false;
+  bool isUpdate = false;
+  late Position currentPosition;
   double lat = 0;
   double long = 0;
-  final double pinSize = 100;
+  double pinSize = 50;
   Color pinColor = Colors.transparent;
   int index = 0;
   var currentPin = <int, Pin>{};
-  var pinDetail = <int, ExpansionTile>{};
+  var pinDetail = <int, PinDetails>{};
   final TransformationController _transformationController =
       TransformationController();
 
@@ -66,12 +69,11 @@ class CalibrateState extends State<Calibrate> {
       return;
     }
 
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high
-    );
+    currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
     setState(() {
-      lat = position.latitude;
-      long = position.longitude;
+      lat = currentPosition.latitude;
+      long = currentPosition.longitude;
       String lx = lat.toStringAsFixed(10);
       String ly = long.toStringAsFixed(10);
       location = 'Lat: $lx, Long: $ly';
@@ -82,13 +84,21 @@ class CalibrateState extends State<Calibrate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-      ),
+      appBar: AppBar(),
       endDrawer: Drawer(
         child: SafeArea(
             child: SingleChildScrollView(
           child: Column(
-            children: [Text("Pin Details"), ...pinDetail.values],
+            children: [
+              const Text(
+                "Pin Details",
+                style: TextStyle(fontSize: 20),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              ...pinDetail.values
+            ],
           ),
         )),
       ),
@@ -97,7 +107,7 @@ class CalibrateState extends State<Calibrate> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            margin: EdgeInsets.all(10),
+            margin: const EdgeInsets.all(10),
             width: 400,
             height: 350,
             decoration: BoxDecoration(
@@ -116,19 +126,14 @@ class CalibrateState extends State<Calibrate> {
                       String dy = (imgOffset.dy).toStringAsFixed(10);
                       offsetShow = "Pixel Offset: $dx, $dy";
                       isPin = true;
-                      if (currentPin.containsKey(index)) {
-                        currentPin.update(
-                            index,
-                            (value) => Pin(
-                                imgOffset: imgOffset,
-                                pinColor: pinColor,
-                                pinSize: pinSize));
-                        return;
+                      if (!currentPin.containsKey(index)) {
+                        oldPin = null;
                       }
                       currentPin[index] = Pin(
-                          imgOffset: imgOffset,
-                          pinColor: pinColor,
-                          pinSize: pinSize);
+                        imgOffset: imgOffset,
+                        pinColor: pinColor,
+                        pinSize: pinSize,
+                      );
                     }
                   });
                 },
@@ -160,9 +165,14 @@ class CalibrateState extends State<Calibrate> {
                   child: OutlinedButton(
                       onPressed: () {
                         setState(() {
+                          if (isUpdate) {
+                            currentPin[index] = oldPin!;
+                          } else if (oldPin == null) {
+                            currentPin.remove(index);
+                          }
+                          isUpdate = false;
                           isPress = false;
                           isPin = false;
-                          imgOffset = initOffset;
                           offsetShow = "";
                           location = "";
                         });
@@ -182,7 +192,7 @@ class CalibrateState extends State<Calibrate> {
                               _getCurrentLocation();
                             }
                           : null,
-                      child: const Text("Apply")))
+                      child: const Text("Apply"))),
             ],
           ),
           const SizedBox(height: 10),
@@ -198,6 +208,10 @@ class CalibrateState extends State<Calibrate> {
                             isPress = true;
                             pinColor = Colors.red;
                             index = 0;
+                            if (currentPin.containsKey(index)) {
+                              isUpdate = true;
+                              oldPin = currentPin[index]!;
+                            }
                           });
                         },
                   icon: const Icon(Icons.location_pin,
@@ -211,6 +225,10 @@ class CalibrateState extends State<Calibrate> {
                             isPress = true;
                             pinColor = Colors.green;
                             index = 1;
+                            if (currentPin.containsKey(index)) {
+                              isUpdate = true;
+                              oldPin = currentPin[index]!;
+                            }
                           });
                         },
                   icon: const Icon(
@@ -227,13 +245,27 @@ class CalibrateState extends State<Calibrate> {
                             isPress = true;
                             pinColor = Colors.blue;
                             index = 2;
+                            if (currentPin.containsKey(index)) {
+                              isUpdate = true;
+                              oldPin = currentPin[index]!;
+                            }
                           });
                         },
                   icon: const Icon(
                     Icons.location_pin,
                     size: 30,
                     color: Colors.blue,
-                  ))
+                  )),
+              const SizedBox(
+                width: 30,
+              ),
+              IconButton(
+                  onPressed: () => updatePinSize(pinSize - 5),
+                  icon: const Icon(Icons.remove_circle)),
+              Text("$pinSize"),
+              IconButton(
+                  onPressed: () => updatePinSize(pinSize + 5),
+                  icon: const Icon(Icons.add_circle))
             ],
           ),
           const SizedBox(
@@ -247,27 +279,23 @@ class CalibrateState extends State<Calibrate> {
   }
 
   void updateDrawer() {
-       pinDetail[index] = ExpansionTile(
-      title: Text("Pin"),
-      leading: Icon(
-        Icons.location_pin,
-        color: pinColor,
-        size: 30,
-      ),
-      children: [
-        ListTile(
-          title: Text("Px: ${imgOffset.dx}"),
-        ),
-        ListTile(
-          title: Text("Py: ${imgOffset.dy}"),
-        ),
-        ListTile(
-          title: Text("Lat: $lat"),
-        ),
-        ListTile(
-          title: Text("Long: $long"),
-        ),
-      ],
-    );
+    pinDetail[index] = PinDetails(
+        pinColor: pinColor,
+        pinOffset: imgOffset,
+        position: currentPosition,
+        edit: () {
+          print("Edit");
+        },
+        remove: () {
+          print("Remove");
+        });
+  }
+
+  void updatePinSize(double size) {
+    setState(() {
+      pinSize = size;
+      currentPin.forEach((key, value) => currentPin[key] = Pin(
+          imgOffset: value.imgOffset, pinColor: value.pinColor, pinSize: size));
+    });
   }
 }
