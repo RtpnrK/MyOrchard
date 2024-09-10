@@ -27,16 +27,6 @@ class CalibrateState extends State<Calibrate> {
   int index = 0;
   var currentPin = <int, Pin>{};
   var pinDetail = <int, PinDetails>{};
-  final TransformationController _transformationController =
-      TransformationController();
-
-  @override
-  void initState() {
-    super.initState();
-    // ตั้งค่า scale เริ่มต้น
-    _transformationController.value = Matrix4.identity()
-      ..scale(0.3); // กำหนดค่า scale
-  }
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled;
@@ -97,7 +87,8 @@ class CalibrateState extends State<Calibrate> {
               const SizedBox(
                 height: 20,
               ),
-              ...pinDetail.values
+              ...pinDetail.values,
+              OutlinedButton(onPressed: (){}, child: Text('Calibrate'))
             ],
           ),
         )),
@@ -113,9 +104,8 @@ class CalibrateState extends State<Calibrate> {
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.black), color: Colors.black),
             child: InteractiveViewer(
-              transformationController: _transformationController,
               minScale: 0.1,
-              maxScale: 0.8,
+              maxScale: 2.0,
               constrained: false,
               child: GestureDetector(
                 onTapDown: (details) {
@@ -255,6 +245,26 @@ class CalibrateState extends State<Calibrate> {
                     Icons.location_pin,
                     size: 30,
                     color: Colors.blue,
+                  )),
+                IconButton(
+                  onPressed: isPress
+                      ? null
+                      : () {
+                          setState(() {
+                            offsetShow = "Pin your location on the map";
+                            isPress = true;
+                            pinColor = Colors.yellow;
+                            index = 3;
+                            if (currentPin.containsKey(index)) {
+                              isUpdate = true;
+                              oldPin = currentPin[index]!;
+                            }
+                          });
+                        },
+                  icon: const Icon(
+                    Icons.location_pin,
+                    size: 30,
+                    color: Colors.yellow,
                   )),
               const SizedBox(
                 width: 30,
