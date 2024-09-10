@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Pin extends StatelessWidget {
-  Offset imgOffset;
-  Color pinColor;
-  double pinSize;
-  Pin({super.key, required this.imgOffset, required this.pinColor, required this.pinSize});
+  final Offset imgOffset;
+  final Color pinColor;
+  final double pinSize;
+  const Pin({super.key, required this.imgOffset, required this.pinColor, required this.pinSize});
 
   @override
   Widget build(BuildContext context) {

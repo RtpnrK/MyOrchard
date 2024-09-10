@@ -17,7 +17,6 @@ class _PickerButtState extends State<PickerButt> {
 
   Future<void> pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       setState(() {
         imagFile = File(pickedFile.path);
@@ -36,9 +35,7 @@ class _PickerButtState extends State<PickerButt> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Map",
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: const Text("แผนที่"),
         ),
@@ -61,7 +58,6 @@ class _PickerButtState extends State<PickerButt> {
                     child: const Text("เลือกรูป"))),
           ],
         ),
-      ),
-    );
+      );
   }
 }
