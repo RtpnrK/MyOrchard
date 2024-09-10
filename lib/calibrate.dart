@@ -88,6 +88,7 @@ class CalibrateState extends State<Calibrate> {
                 height: 20,
               ),
               ...pinDetail.values,
+              SizedBox(height: 20),
               OutlinedButton(onPressed: (){}, child: Text('Calibrate'))
             ],
           ),
@@ -293,11 +294,8 @@ class CalibrateState extends State<Calibrate> {
         pinColor: pinColor,
         pinOffset: imgOffset,
         position: currentPosition,
-        edit: () {
-          print("Edit");
-        },
         remove: () {
-          print("Remove");
+          print("test");
         });
   }
 

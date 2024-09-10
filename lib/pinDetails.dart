@@ -5,7 +5,6 @@ class PinDetails extends StatelessWidget {
   final Color pinColor;
   final Offset pinOffset;
   final Position position;
-  final VoidCallback edit;
   final VoidCallback remove; 
 
   const PinDetails({
@@ -13,7 +12,6 @@ class PinDetails extends StatelessWidget {
     required this.pinColor,
     required this.pinOffset,
     required this.position,
-    required this.edit,
     required this.remove,
   });
 
@@ -71,21 +69,11 @@ class PinDetails extends StatelessWidget {
             ),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            TextButton(
-                onPressed: () => edit,
-                child: const Column(
-                  children: [Icon(Icons.edit), Text("Edit")],
-                )),
-            TextButton(
-                onPressed: () => remove,
-                child: const Column(
-                  children: [Icon(Icons.delete), Text("Remove")],
-                )),
-          ],
-        )
+        TextButton(
+            onPressed: () => remove,
+            child: const Column(
+              children: [Icon(Icons.delete), Text("Remove")],
+            ))
       ],
     );
   }
