@@ -74,9 +74,11 @@ class CalibrateState extends State<Calibrate> {
           child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Container(
-              margin: EdgeInsets.all(10),
-              child: InteractiveViewer(
+          Expanded(
+            child: InteractiveViewer(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height / 2,
                 child: GestureDetector(
                   onTapDown: (details) {
                     setState(() {
@@ -85,7 +87,7 @@ class CalibrateState extends State<Calibrate> {
                         String dx = imgOffset.dx.toStringAsFixed(10);
                         String dy = imgOffset.dy.toStringAsFixed(10);
                         offsetShow = "Pixel Offset: $dx, $dy";
-
+            
                         isPin = true;
                       }
                     });
@@ -93,10 +95,13 @@ class CalibrateState extends State<Calibrate> {
                   child: Stack(
                     children: [
                       widget.image != null
-                          ? Image.file(
-                              widget.image!,
-                              height: MediaQuery.of(context).size.height / 2,
-                              width: MediaQuery.of(context).size.width,
+                          ? FittedBox(
+                              fit: BoxFit.fitHeight,
+                              child: Image.file(
+                                widget.image!,
+                                height: MediaQuery.of(context).size.height / 2,
+                                width: MediaQuery.of(context).size.width,
+                              ),
                             )
                           : Image.asset("assets/images/map1.png",
                               fit: BoxFit.contain),
@@ -104,12 +109,13 @@ class CalibrateState extends State<Calibrate> {
                         Positioned(
                             left: imgOffset.dx - 10,
                             top: imgOffset.dy - 20,
-                            child:
-                                Icon(Icons.location_pin, color: pin, size: 20))
+                            child: Icon(Icons.location_pin, color: pin, size: 20))
                     ],
                   ),
                 ),
-              )),
+              ),
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
