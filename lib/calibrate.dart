@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -29,6 +30,8 @@ class CalibrateState extends State<Calibrate> {
   int index = 0;
   var currentPin = <int, Pin>{};
   var pinDetail = <int, PinDetails>{};
+  Offset currentOffset = Offset(0, 0);
+  late Optimize opt;
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled;
@@ -64,12 +67,9 @@ class CalibrateState extends State<Calibrate> {
     currentPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     setState(() {
+      
       lat = currentPosition.latitude;
       long = currentPosition.longitude;
-      String lx = lat.toStringAsFixed(10);
-      String ly = long.toStringAsFixed(10);
-      location = 'Lat: $lx, Long: $ly';
-      updateDrawer();
     });
   }
 
@@ -93,20 +93,28 @@ class CalibrateState extends State<Calibrate> {
               SizedBox(height: 20),
               OutlinedButton(
                 onPressed: pinDetail.length >= 3
-                    ? () {
+                    ? () async {
                         List<List<double>> l1 = [[],[]];
                         List<List<double>> l2 = [[],[]];
                         pinDetail.forEach((i, e) {
-                          l1[0].add(e.position.longitude);
-                          l1[1].add(e.position.latitude);
+                          l1[0].add(e.position.latitude);
+                          l1[1].add(e.position.longitude);
                           l2[0].add(e.pinOffset.dx);
                           l2[1].add(e.pinOffset.dy);
                         });
-                        var GP = Matrix.fromList(l1);
-                        var SP = Matrix.fromList(l2);
-                        Optimize opt = Optimize(GP, SP);
+                        var GP = Matrix.fromList(l1,dtype: DType.float64);
+                        var SP = Matrix.fromList(l2,dtype: DType.float64);
+                        opt = Optimize(GP, SP);
                         opt.solve();
-                        print(opt.v);
+                        await _getCurrentLocation();
+                        var current_gp = Matrix.fromList([[lat],[long]],dtype: DType.float64);
+                        var current_sp = opt.toSP(current_gp);
+                        currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
+                        offsetShow = 'Offset: ${current_sp[0][0]}, ${current_sp[1][0]}';
+                        //print(opt.v);
+                        print(current_sp);
+                        print(current_gp);
+                        
                       }
                     : null,
                 child: Text('Calibrate'),
@@ -159,7 +167,12 @@ class CalibrateState extends State<Calibrate> {
                           )
                         : Image.asset("assets/images/map1.png",
                             fit: BoxFit.contain),
-                    ...currentPin.values
+                    ...currentPin.values,
+                    Positioned(
+                    child: Icon(Icons.man,size: pinSize),
+                    left: currentOffset.dx-(pinSize/2),
+                    top: currentOffset.dy-pinSize,
+                    )
                   ],
                 ),
               ),
@@ -197,11 +210,12 @@ class CalibrateState extends State<Calibrate> {
                   maintainState: true,
                   child: OutlinedButton(
                       onPressed: isPin
-                          ? () {
+                          ? () async {
                               setState(() {
                                 isPress = false;
                               });
-                              _getCurrentLocation();
+                              await _getCurrentLocation();
+                              updateLocation();
                             }
                           : null,
                       child: const Text("Apply"))),
@@ -288,6 +302,26 @@ class CalibrateState extends State<Calibrate> {
                     size: 30,
                     color: Colors.yellow,
                   )),
+              IconButton(
+                  onPressed: isPress
+                      ? null
+                      : () {
+                          setState(() {
+                            offsetShow = "Pin your location on the map";
+                            isPress = true;
+                            pinColor = Colors.purple;
+                            index = 4;
+                            if (currentPin.containsKey(index)) {
+                              isUpdate = true;
+                              oldPin = currentPin[index]!;
+                            }
+                          });
+                        },
+                  icon: const Icon(
+                    Icons.location_pin,
+                    size: 30,
+                    color: Colors.purple,
+                  )),
               const SizedBox(
                 width: 30,
               ),
@@ -304,7 +338,18 @@ class CalibrateState extends State<Calibrate> {
             height: 10,
           ),
           Text(offsetShow),
-          Text(location)
+          Text(location),
+          SizedBox(height: 10,),
+          OutlinedButton(onPressed: () async {
+            await _getCurrentLocation();
+            var current_gp = Matrix.fromList([[lat],[long]],dtype: DType.float64);
+            var current_sp = opt.toSP(current_gp);
+            log(current_sp.toString());
+            log(current_gp.toString());
+            setState(() {
+              currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
+            });
+          }, child: Text('Update'))
         ],
       )),
     );
@@ -326,5 +371,12 @@ class CalibrateState extends State<Calibrate> {
       currentPin.forEach((key, value) => currentPin[key] = Pin(
           imgOffset: value.imgOffset, pinColor: value.pinColor, pinSize: size));
     });
+  }
+  
+  void updateLocation() {
+    String lx = lat.toStringAsFixed(10);
+    String ly = long.toStringAsFixed(10);
+    location = 'Lat: $lx, Long: $ly';
+    updateDrawer();
   }
 }
