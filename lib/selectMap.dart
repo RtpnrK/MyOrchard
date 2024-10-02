@@ -34,29 +34,42 @@ class _PickerButtState extends State<PickerButt> {
 
   @override
   Widget build(BuildContext context) {
+   
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("แผนที่"),
-        ),
-        body: Column(
-          children: [
-            Center(
-              child: SizedBox(
-                height: 400,
-                width: 400,
-                child: imagFile != null
-                    ? Image.file(imagFile!)
-                    : const Text("กรุณาเพิ่มรูป"),
-              ),
+      appBar: AppBar(
+        title: const Text("แผนที่"),
+      ),
+      body:  Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: SizedBox(
+              // height: 400,
+              // width: 400,
+              child: imagFile != null
+                  ? Image.file(imagFile!)
+                  : const Text(
+                      "กรุณาเพิ่มรูป",
+                      style: TextStyle(fontSize: 50),
+                    ),
             ),
-            Center(
-                child: ElevatedButton(
-                    onPressed: () {
-                      pickImage();
-                    },
-                    child: const Text("เลือกรูป"))),
-          ],
-        ),
-      );
+          ),
+          Center(
+              child: ElevatedButton(
+            onPressed: () {
+              pickImage();
+            },
+            style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(color: Colors.black, width: 2),
+                    borderRadius: BorderRadius.circular(25))),
+            child: const Text(
+              "เลือกรูป",
+              style: TextStyle(fontSize: 40),
+            ),
+          )),
+        ],
+      ),
+    );
   }
 }
