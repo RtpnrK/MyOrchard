@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:ml_linalg/linalg.dart';
+import 'package:myorchard/optimize.dart';
 import 'package:myorchard/pin.dart';
 import 'package:myorchard/pinDetails.dart';
 
@@ -89,7 +91,26 @@ class CalibrateState extends State<Calibrate> {
               ),
               ...pinDetail.values,
               SizedBox(height: 20),
-              OutlinedButton(onPressed: (){}, child: Text('Calibrate'))
+              OutlinedButton(
+                onPressed: pinDetail.length >= 3
+                    ? () {
+                        List<List<double>> l1 = [[],[]];
+                        List<List<double>> l2 = [[],[]];
+                        pinDetail.forEach((i, e) {
+                          l1[0].add(e.position.longitude);
+                          l1[1].add(e.position.latitude);
+                          l2[0].add(e.pinOffset.dx);
+                          l2[1].add(e.pinOffset.dy);
+                        });
+                        var GP = Matrix.fromList(l1);
+                        var SP = Matrix.fromList(l2);
+                        Optimize opt = Optimize(GP, SP);
+                        opt.solve();
+                        print(opt.v);
+                      }
+                    : null,
+                child: Text('Calibrate'),
+              )
             ],
           ),
         )),
@@ -247,7 +268,7 @@ class CalibrateState extends State<Calibrate> {
                     size: 30,
                     color: Colors.blue,
                   )),
-                IconButton(
+              IconButton(
                   onPressed: isPress
                       ? null
                       : () {
