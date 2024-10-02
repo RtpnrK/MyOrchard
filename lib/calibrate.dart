@@ -26,6 +26,7 @@ class CalibrateState extends State<Calibrate> {
   double lat = 0;
   double long = 0;
   double pinSize = 50;
+  late double newPinSize;
   Color pinColor = Colors.transparent;
   int index = 0;
   var currentPin = <int, Pin>{};
@@ -67,7 +68,6 @@ class CalibrateState extends State<Calibrate> {
     currentPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     setState(() {
-      
       lat = currentPosition.latitude;
       long = currentPosition.longitude;
     });
@@ -94,27 +94,30 @@ class CalibrateState extends State<Calibrate> {
               OutlinedButton(
                 onPressed: pinDetail.length >= 3
                     ? () async {
-                        List<List<double>> l1 = [[],[]];
-                        List<List<double>> l2 = [[],[]];
+                        List<List<double>> l1 = [[], []];
+                        List<List<double>> l2 = [[], []];
                         pinDetail.forEach((i, e) {
                           l1[0].add(e.position.latitude);
                           l1[1].add(e.position.longitude);
                           l2[0].add(e.pinOffset.dx);
                           l2[1].add(e.pinOffset.dy);
                         });
-                        var GP = Matrix.fromList(l1,dtype: DType.float64);
-                        var SP = Matrix.fromList(l2,dtype: DType.float64);
+                        var GP = Matrix.fromList(l1, dtype: DType.float64);
+                        var SP = Matrix.fromList(l2, dtype: DType.float64);
                         opt = Optimize(GP, SP);
                         opt.solve();
                         await _getCurrentLocation();
-                        var current_gp = Matrix.fromList([[lat],[long]],dtype: DType.float64);
+                        var current_gp = Matrix.fromList([
+                          [lat],
+                          [long]
+                        ], dtype: DType.float64);
                         var current_sp = opt.toSP(current_gp);
-                        currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
-                        offsetShow = 'Offset: ${current_sp[0][0]}, ${current_sp[1][0]}';
-                        //print(opt.v);
-                        print(current_sp);
-                        print(current_gp);
-                        
+                        currentOffset =
+                            Offset(current_sp[0][0], current_sp[1][0]);
+                        offsetShow =
+                            'Offset: ${current_sp[0][0]}, ${current_sp[1][0]}';
+                        log(current_sp.toString());
+                        log(current_gp.toString());
                       }
                     : null,
                 child: Text('Calibrate'),
@@ -169,9 +172,9 @@ class CalibrateState extends State<Calibrate> {
                             fit: BoxFit.contain),
                     ...currentPin.values,
                     Positioned(
-                    child: Icon(Icons.man,size: pinSize),
-                    left: currentOffset.dx-(pinSize/2),
-                    top: currentOffset.dy-pinSize,
+                      child: Icon(Icons.man, size: pinSize),
+                      left: currentOffset.dx - (pinSize / 2),
+                      top: currentOffset.dy - pinSize,
                     )
                   ],
                 ),
@@ -326,12 +329,61 @@ class CalibrateState extends State<Calibrate> {
                 width: 30,
               ),
               IconButton(
-                  onPressed: () => updatePinSize(pinSize - 5),
-                  icon: const Icon(Icons.remove_circle)),
-              Text("$pinSize"),
-              IconButton(
-                  onPressed: () => updatePinSize(pinSize + 5),
-                  icon: const Icon(Icons.add_circle))
+                onPressed: () {
+                  newPinSize = pinSize;
+                  showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) {
+                        return StatefulBuilder(builder: (context, setState) {
+                          return AlertDialog(
+                            title: Text('Pin Settings'),
+                            content: Row(
+                              children: [
+                                Text(
+                                  'Pin Size',
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                SizedBox(
+                                  width: 50,
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        newPinSize -= 5;
+                                      });
+                                    },
+                                    icon: Icon(Icons.remove_circle)),
+                                Text('$newPinSize'),
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        newPinSize += 5;
+                                      });
+                                    },
+                                    icon: Icon(Icons.add_circle)),
+                              ],
+                            ),
+                            actions: [
+                              OutlinedButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, 'Cancel');
+                                  },
+                                  child: Text('Cancel')),
+                              OutlinedButton(
+                                  onPressed: () {
+                                    pinSize = newPinSize;
+                                    updatePinSize(newPinSize);
+                                    Navigator.pop(context, 'Apply');
+                                  },
+                                  child: Text('Apply'))
+                            ],
+                          );
+                        });
+                      });
+                },
+                icon: Icon(Icons.settings),
+              ),
             ],
           ),
           const SizedBox(
@@ -339,17 +391,24 @@ class CalibrateState extends State<Calibrate> {
           ),
           Text(offsetShow),
           Text(location),
-          SizedBox(height: 10,),
-          OutlinedButton(onPressed: () async {
-            await _getCurrentLocation();
-            var current_gp = Matrix.fromList([[lat],[long]],dtype: DType.float64);
-            var current_sp = opt.toSP(current_gp);
-            log(current_sp.toString());
-            log(current_gp.toString());
-            setState(() {
-              currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
-            });
-          }, child: Text('Update'))
+          SizedBox(
+            height: 10,
+          ),
+          OutlinedButton(
+              onPressed: () async {
+                await _getCurrentLocation();
+                var current_gp = Matrix.fromList([
+                  [lat],
+                  [long]
+                ], dtype: DType.float64);
+                var current_sp = opt.toSP(current_gp);
+                log(current_sp.toString());
+                log(current_gp.toString());
+                setState(() {
+                  currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
+                });
+              },
+              child: Text('Update'))
         ],
       )),
     );
@@ -372,7 +431,7 @@ class CalibrateState extends State<Calibrate> {
           imgOffset: value.imgOffset, pinColor: value.pinColor, pinSize: size));
     });
   }
-  
+
   void updateLocation() {
     String lx = lat.toStringAsFixed(10);
     String ly = long.toStringAsFixed(10);
