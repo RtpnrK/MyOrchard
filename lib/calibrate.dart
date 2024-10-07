@@ -225,7 +225,7 @@ class CalibrateState extends State<Calibrate> {
                               await _loadingState();
                               updateDrawer();
                               pinCount++;
-                              message = "Your location is save at $imgOffset.";
+                              message = "Your location is saved at $imgOffset.";
                             }
                           : null,
                       child: const Text("Apply"))),
