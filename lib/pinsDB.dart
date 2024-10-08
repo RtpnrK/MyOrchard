@@ -67,8 +67,10 @@ class DatabaseHelper {
 }
   void fetchPins() async {
     List<PinM> pins = await getPins();
-    for (var pin in pins) {
-      print('Pin: ${pin.latitude}, ${pin.longitude}, ${pin.offsetX}, ${pin.offsetY}, ${pin.color}');
+    Database db = await database;
+    List<Map<String, dynamic>> maps = await db.query('pins_New');
+    for(var m in maps) {
+      
     }
   }
 

@@ -122,15 +122,15 @@ class CalibrateState extends State<Calibrate> {
                     ? () async {
                         List<List<double>> l1 = [[], []];
                         List<List<double>> l2 = [[], []];
+                        DatabaseHelper().deleteAllPins();
                         pinDetail.forEach((i, e) {
-                          l1[0].add(e.position.latitude);
-                          l1[1].add(e.position.longitude);
+                          l1[0].add(e.lat);
+                          l1[1].add(e.long);
                           l2[0].add(e.pinOffset.dx);
                           l2[1].add(e.pinOffset.dy);
-                          DatabaseHelper().deleteAllPins();
                           DatabaseHelper().insertPin(PinM(
-                              latitude: e.position.latitude,
-                              longitude: e.position.longitude,
+                              latitude: e.lat,
+                              longitude: e.long,
                               offsetX: e.pinOffset.dx,
                               offsetY: e.pinOffset.dy,
                               color: e.pinColor.value.toRadixString(16)));
@@ -387,7 +387,8 @@ class CalibrateState extends State<Calibrate> {
     pinDetail[index] = PinDetails(
         pinColor: pinColor,
         pinOffset: imgOffset,
-        position: currentPosition,
+        lat: currentPosition.latitude,
+        long: currentPosition.longitude,
         remove: () {
           setState(() {
             currentPin.remove(thisPin);
