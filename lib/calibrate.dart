@@ -9,6 +9,7 @@ import 'package:myorchard/optimize.dart';
 import 'package:myorchard/pin.dart';
 import 'package:myorchard/pinDetails.dart';
 import 'package:myorchard/pinsDB.dart';
+import 'package:sqflite/utils/utils.dart';
 
 class Calibrate extends StatefulWidget {
   final File? image;
@@ -49,8 +50,19 @@ class CalibrateState extends State<Calibrate> {
   Future<void> loadData() async {
     List<PinM> pins = await DatabaseHelper().getPins();
     for (var pin in pins) {
-      imgOffset = Offset(pin.offsetX, pin.offsetY);
-      // currentPosition = ;
+      PinDetails(
+        pinColor: colorFromHex(pin.color)!,
+        pinOffset: Offset(pin.offsetX, pin.offsetY),
+        lat: pin.latitude,
+        long: pin.longitude,
+        remove: () {
+          setState(() {
+            currentPin.remove(pin.id);
+            pinDetail.remove(pin.id);
+            pinCount--;
+          });
+        });
+
 
     }
   }
@@ -133,13 +145,13 @@ class CalibrateState extends State<Calibrate> {
                         List<List<double>> l2 = [[], []];
                         DatabaseHelper().deleteAllPins();
                         pinDetail.forEach((i, e) {
-                          l1[0].add(e.position.latitude);
-                          l1[1].add(e.position.longitude);
+                          l1[0].add(e.lat);
+                          l1[1].add(e.long);
                           l2[0].add(e.pinOffset.dx);
                           l2[1].add(e.pinOffset.dy);
                           DatabaseHelper().insertPin(PinM(
-                              latitude: e.position.latitude,
-                              longitude: e.position.longitude,
+                              latitude: e.lat,
+                              longitude: e.long,
                               offsetX: e.pinOffset.dx,
                               offsetY: e.pinOffset.dy,
                               color: e.pinColor.value.toRadixString(16)));
@@ -396,7 +408,8 @@ class CalibrateState extends State<Calibrate> {
     pinDetail[index] = PinDetails(
         pinColor: pinColor,
         pinOffset: imgOffset,
-        position: currentPosition,
+        lat: currentPosition.latitude,
+        long: currentPosition.longitude,
         remove: () {
           setState(() {
             currentPin.remove(thisPin);
