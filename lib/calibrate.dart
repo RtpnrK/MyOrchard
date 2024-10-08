@@ -150,7 +150,7 @@ class CalibrateState extends State<Calibrate> {
                         log(current_gp.toString());
 
                         print("Pins");
-                        print(pins);
+                        DatabaseHelper().fetchLatestPin();
                       }
                     : null,
                 child: const Text('Calibrate'),
