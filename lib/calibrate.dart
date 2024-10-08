@@ -44,13 +44,16 @@ class CalibrateState extends State<Calibrate> {
   void initState() {
     DatabaseHelper().getPins();
     loadData();
+    DatabaseHelper().fetchPins();
     super.initState();
   }
 
   Future<void> loadData() async {
     List<PinM> pins = await DatabaseHelper().getPins();
-    for (var pin in pins) {
-      PinDetails(
+    print("Data Loaded!");
+    setState(() {
+       for (var pin in pins) {
+        pinDetail[pin.id!] = PinDetails(
         pinColor: colorFromHex(pin.color)!,
         pinOffset: Offset(pin.offsetX, pin.offsetY),
         lat: pin.latitude,
@@ -62,9 +65,13 @@ class CalibrateState extends State<Calibrate> {
             pinCount--;
           });
         });
-
-
+        currentPin[pin.id!] = Pin(
+          imgOffset: Offset(pin.offsetX, pin.offsetY),
+          pinColor: colorFromHex(pin.color)!,
+          pinSize: pinSize);
     }
+    });
+  
   }
 
   Future<void> _getCurrentLocation() async {

@@ -70,7 +70,7 @@ class DatabaseHelper {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.query('pins_New');
     for(var m in maps) {
-      
+      print(m.toString());
     }
   }
 
