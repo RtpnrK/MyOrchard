@@ -69,7 +69,7 @@ class CalibrateState extends State<Calibrate> {
 
     currentPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    Navigator.of(context).pop;
+        
     setState(() {
       lat = currentPosition.latitude;
       long = currentPosition.longitude;
@@ -135,7 +135,7 @@ class CalibrateState extends State<Calibrate> {
                       }
                     : null,
                 label: const Text('Calibrate'),
-                icon: Icon(Icons.compass_calibration),
+                icon: const Icon(Icons.compass_calibration),
               )
             ],
           ),
