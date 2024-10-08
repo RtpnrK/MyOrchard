@@ -19,7 +19,7 @@ class PinDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     double lat = position.latitude;
     double long = position.longitude;
-    TextStyle style = TextStyle(fontSize: 15);
+    TextStyle style = const TextStyle(fontSize: 15);
 
     return ExpansionTile(
       title: const Text("Pin"),
@@ -34,7 +34,7 @@ class PinDetails extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
             child: Text(
-              "Px: ${pinOffset.dx}",
+              "Px: ${pinOffset.dx.toStringAsFixed(2)}",
               style: style,
             ),
           ),
@@ -44,7 +44,7 @@ class PinDetails extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
             child: Text(
-              "Py: ${pinOffset.dy}",
+              "Py: ${pinOffset.dy.toStringAsFixed(2)}",
               style: style,
             ),
           ),

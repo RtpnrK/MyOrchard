@@ -76,15 +76,15 @@ class CalibrateState extends State<Calibrate> {
     });
   }
 
-  Future<void> _loadingState() async{
+  Future<void> _loadingState() async {
     showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context){
-        return const Center(child: CircularProgressIndicator());
-      });
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const Center(child: CircularProgressIndicator());
+        });
     await _getCurrentLocation();
-    if(mounted){
+    if (mounted) {
       Navigator.of(context).pop();
     }
   }
@@ -107,7 +107,7 @@ class CalibrateState extends State<Calibrate> {
               ),
               ...pinDetail.values,
               const SizedBox(height: 20),
-              ElevatedButton(
+              ElevatedButton.icon(
                 onPressed: pinDetail.length >= 3
                     ? () async {
                         List<List<double>> l1 = [[], []];
@@ -122,7 +122,7 @@ class CalibrateState extends State<Calibrate> {
                         var SP = Matrix.fromList(l2, dtype: DType.float64);
                         opt = Optimize(GP, SP);
                         opt.solve();
-                        await _getCurrentLocation();
+                        await _loadingState();
                         var current_gp = Matrix.fromList([
                           [lat],
                           [long]
@@ -134,7 +134,8 @@ class CalibrateState extends State<Calibrate> {
                         log(current_gp.toString());
                       }
                     : null,
-                child: const Text('Calibrate'),
+                label: const Text('Calibrate'),
+                icon: Icon(Icons.compass_calibration),
               )
             ],
           ),
@@ -148,8 +149,11 @@ class CalibrateState extends State<Calibrate> {
             margin: const EdgeInsets.all(10),
             width: 400,
             height: 350,
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.black), color: Colors.black),
+            decoration: const BoxDecoration(
+              boxShadow: [
+                BoxShadow(color: Color.fromRGBO(64, 64, 64, 1), blurRadius: 10)
+              ],
+            ),
             child: InteractiveViewer(
               minScale: 0.1,
               maxScale: 2.0,
@@ -231,7 +235,7 @@ class CalibrateState extends State<Calibrate> {
                       child: const Text("Apply"))),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -247,15 +251,18 @@ class CalibrateState extends State<Calibrate> {
                                       pickerColor: pickerColor,
                                       onColorChanged: colorChange),
                                   actions: [
-                                    ElevatedButton(onPressed: (){
-                                      Navigator.of(context).pop();
-                                    }, child: Text("Cancel")),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text("Cancel")),
                                     ElevatedButton(
                                         onPressed: () {
                                           setState(() {
                                             pinColor = pickerColor;
                                           });
-                                          message = "Mark your location on a map.";
+                                          message =
+                                              "Mark your location on a map.";
                                           index = pinCount;
                                           isPress = true;
                                           Navigator.of(context).pop();
@@ -333,27 +340,9 @@ class CalibrateState extends State<Calibrate> {
             ],
           ),
           const SizedBox(
-            height: 10,
+            height: 30,
           ),
           Text(message),
-          const SizedBox(
-            height: 10,
-          ),
-          ElevatedButton(
-              onPressed: () async {
-                await _getCurrentLocation();
-                var current_gp = Matrix.fromList([
-                  [lat],
-                  [long]
-                ], dtype: DType.float64);
-                var current_sp = opt.toSP(current_gp);
-                log(current_sp.toString());
-                log(current_gp.toString());
-                setState(() {
-                  currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
-                });
-              },
-              child: const Text('Update'))
         ],
       )),
     );
@@ -385,6 +374,20 @@ class CalibrateState extends State<Calibrate> {
   void colorChange(Color color) {
     setState(() {
       pickerColor = color;
+    });
+  }
+
+  Future<void> updateGPS() async {
+    await _getCurrentLocation();
+    var current_gp = Matrix.fromList([
+      [lat],
+      [long]
+    ], dtype: DType.float64);
+    var current_sp = opt.toSP(current_gp);
+    log(current_sp.toString());
+    log(current_gp.toString());
+    setState(() {
+      currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
     });
   }
 }
