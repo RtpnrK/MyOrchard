@@ -127,6 +127,7 @@ class CalibrateState extends State<Calibrate> {
                           l1[1].add(e.position.longitude);
                           l2[0].add(e.pinOffset.dx);
                           l2[1].add(e.pinOffset.dy);
+                          DatabaseHelper().deleteAllPins();
                           DatabaseHelper().insertPin(PinM(
                               latitude: e.position.latitude,
                               longitude: e.position.longitude,
@@ -150,7 +151,7 @@ class CalibrateState extends State<Calibrate> {
                         log(current_gp.toString());
 
                         print("Pins");
-                        DatabaseHelper().fetchLatestPin();
+                        DatabaseHelper().fetchPins();
                       }
                     : null,
                 child: const Text('Calibrate'),

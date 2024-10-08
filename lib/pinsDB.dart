@@ -61,34 +61,17 @@ class DatabaseHelper {
     return maps.map((map) => PinM.fromMap(map)).toList();
   }
 
-  Future<PinM?> getLatestPin() async {
+  Future<int> deleteAllPins() async {
     Database db = await database;
-
-    // ดึงแถวล่าสุดจากตารางโดยเรียงตาม created_at และจำกัดผลลัพธ์ไว้ที่ 1 แถว
-    List<Map<String, dynamic>> maps = await db.query(
-      'pins_New',
-      orderBy: 'created_at DESC', // เรียงลำดับตาม created_at จากมากไปน้อย
-      limit: 1, // จำกัดผลลัพธ์ให้เป็น 1 แถว
-    );
-
-    // ตรวจสอบว่ามีผลลัพธ์หรือไม่ และแปลงเป็น PinM
-    if (maps.isNotEmpty) {
-      return PinM.fromMap(maps.first);
-    }
-
-    return null; // คืนค่า null ถ้าไม่มีข้อมูล
-  }
-
-  void fetchLatestPin() async {
-    PinM? latestPin = await getLatestPin();
-
-    if (latestPin != null) {
-      print(
-          'Latest Pin: ${latestPin.latitude}, ${latestPin.longitude}, ${latestPin.offsetX}, ${latestPin.offsetY}, ${latestPin.color}');
-    } else {
-      print('No pins found.');
+    return await db.delete('pins_New'); // ไม่มีเงื่อนไข จะลบข้อมูลทั้งหมด
+}
+  void fetchPins() async {
+    List<PinM> pins = await getPins();
+    for (var pin in pins) {
+      print('Pin: ${pin.latitude}, ${pin.longitude}, ${pin.offsetX}, ${pin.offsetY}, ${pin.color}');
     }
   }
+
 
   // Delete a pin
   Future<int> deletePin(int id) async {
