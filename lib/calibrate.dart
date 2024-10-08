@@ -42,8 +42,17 @@ class CalibrateState extends State<Calibrate> {
   @override
   void initState() {
     DatabaseHelper().getPins();
-    pins.add(DatabaseHelper().getPins());
+    loadData();
     super.initState();
+  }
+
+  Future<void> loadData() async {
+    List<PinM> pins = await DatabaseHelper().getPins();
+    for (var pin in pins) {
+      imgOffset = Offset(pin.offsetX, pin.offsetY);
+      // currentPosition = ;
+
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -122,12 +131,12 @@ class CalibrateState extends State<Calibrate> {
                     ? () async {
                         List<List<double>> l1 = [[], []];
                         List<List<double>> l2 = [[], []];
+                        DatabaseHelper().deleteAllPins();
                         pinDetail.forEach((i, e) {
                           l1[0].add(e.position.latitude);
                           l1[1].add(e.position.longitude);
                           l2[0].add(e.pinOffset.dx);
                           l2[1].add(e.pinOffset.dy);
-                          DatabaseHelper().deleteAllPins();
                           DatabaseHelper().insertPin(PinM(
                               latitude: e.position.latitude,
                               longitude: e.position.longitude,
