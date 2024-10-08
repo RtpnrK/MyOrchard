@@ -1,11 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ml_linalg/linalg.dart';
+import 'package:myorchard/model/pinModel.dart';
 import 'package:myorchard/optimize.dart';
 import 'package:myorchard/pin.dart';
 import 'package:myorchard/pinDetails.dart';
+import 'package:myorchard/pinsDB.dart';
 
 class Calibrate extends StatefulWidget {
   final File? image;
@@ -16,23 +19,32 @@ class Calibrate extends StatefulWidget {
 
 class CalibrateState extends State<Calibrate> {
   Offset imgOffset = const Offset(0, 0);
+  Offset currentOffset = const Offset(0, 0);
   Pin? oldPin;
-  String offsetShow = "";
-  String location = "";
+  String message = "Please add pin at least 3 points to start calibrate.";
   bool isPress = false;
   bool isPin = false;
   bool isUpdate = false;
-  late Position currentPosition;
   double lat = 0;
   double long = 0;
   double pinSize = 50;
-  late double newPinSize;
   Color pinColor = Colors.transparent;
+  Color pickerColor = Colors.transparent;
   int index = 0;
+  int pinCount = 0;
   var currentPin = <int, Pin>{};
   var pinDetail = <int, PinDetails>{};
-  Offset currentOffset = Offset(0, 0);
+  late Position currentPosition;
+  late double newPinSize;
   late Optimize opt;
+  late List pins = [];
+
+  @override
+  void initState() {
+    DatabaseHelper().getPins();
+    pins.addAll(DatabaseHelper().getPins() as Iterable);
+    super.initState();
+  }
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled;
@@ -41,7 +53,7 @@ class CalibrateState extends State<Calibrate> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       setState(() {
-        location = 'Location services are disabled.';
+        message = 'Location services are disabled.';
       });
       return;
     }
@@ -51,7 +63,7 @@ class CalibrateState extends State<Calibrate> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         setState(() {
-          location = 'Location permissions are denied';
+          message = 'Location permissions are denied';
         });
         return;
       }
@@ -59,7 +71,7 @@ class CalibrateState extends State<Calibrate> {
 
     if (permission == LocationPermission.deniedForever) {
       setState(() {
-        location =
+        message =
             'Location permissions are permanently denied, we cannot request permissions.';
       });
       return;
@@ -67,10 +79,24 @@ class CalibrateState extends State<Calibrate> {
 
     currentPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+    Navigator.of(context).pop;
     setState(() {
       lat = currentPosition.latitude;
       long = currentPosition.longitude;
     });
+  }
+
+  Future<void> _loadingState() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const Center(child: CircularProgressIndicator());
+        });
+    await _getCurrentLocation();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -90,8 +116,8 @@ class CalibrateState extends State<Calibrate> {
                 height: 20,
               ),
               ...pinDetail.values,
-              SizedBox(height: 20),
-              OutlinedButton(
+              const SizedBox(height: 20),
+              ElevatedButton(
                 onPressed: pinDetail.length >= 3
                     ? () async {
                         List<List<double>> l1 = [[], []];
@@ -101,6 +127,12 @@ class CalibrateState extends State<Calibrate> {
                           l1[1].add(e.position.longitude);
                           l2[0].add(e.pinOffset.dx);
                           l2[1].add(e.pinOffset.dy);
+                          DatabaseHelper().insertPin(PinM(
+                              latitude: e.position.latitude,
+                              longitude: e.position.longitude,
+                              offsetX: e.pinOffset.dx,
+                              offsetY: e.pinOffset.dy,
+                              color: e.pinColor));
                         });
                         var GP = Matrix.fromList(l1, dtype: DType.float64);
                         var SP = Matrix.fromList(l2, dtype: DType.float64);
@@ -114,13 +146,14 @@ class CalibrateState extends State<Calibrate> {
                         var current_sp = opt.toSP(current_gp);
                         currentOffset =
                             Offset(current_sp[0][0], current_sp[1][0]);
-                        offsetShow =
-                            'Offset: ${current_sp[0][0]}, ${current_sp[1][0]}';
                         log(current_sp.toString());
                         log(current_gp.toString());
+                        
+                        print("Pins");
+                        print(pins);
                       }
                     : null,
-                child: Text('Calibrate'),
+                child: const Text('Calibrate'),
               )
             ],
           ),
@@ -145,9 +178,6 @@ class CalibrateState extends State<Calibrate> {
                   setState(() {
                     if (isPress) {
                       imgOffset = details.localPosition;
-                      String dx = (imgOffset.dx).toStringAsFixed(10);
-                      String dy = (imgOffset.dy).toStringAsFixed(10);
-                      offsetShow = "Pixel Offset: $dx, $dy";
                       isPin = true;
                       if (!currentPin.containsKey(index)) {
                         oldPin = null;
@@ -172,9 +202,9 @@ class CalibrateState extends State<Calibrate> {
                             fit: BoxFit.contain),
                     ...currentPin.values,
                     Positioned(
-                      child: Icon(Icons.man, size: pinSize),
                       left: currentOffset.dx - (pinSize / 2),
                       top: currentOffset.dy - pinSize,
+                      child: Icon(Icons.man, size: pinSize),
                     )
                   ],
                 ),
@@ -190,19 +220,13 @@ class CalibrateState extends State<Calibrate> {
                   maintainSize: true,
                   maintainAnimation: true,
                   maintainState: true,
-                  child: OutlinedButton(
+                  child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          if (isUpdate) {
-                            currentPin[index] = oldPin!;
-                          } else if (oldPin == null) {
-                            currentPin.remove(index);
-                          }
-                          isUpdate = false;
+                          currentPin.remove(index);
                           isPress = false;
                           isPin = false;
-                          offsetShow = "";
-                          location = "";
+                          message = "";
                         });
                       },
                       child: const Text("Cancel"))),
@@ -211,14 +235,16 @@ class CalibrateState extends State<Calibrate> {
                   maintainSize: true,
                   maintainAnimation: true,
                   maintainState: true,
-                  child: OutlinedButton(
+                  child: ElevatedButton(
                       onPressed: isPin
                           ? () async {
                               setState(() {
                                 isPress = false;
                               });
-                              await _getCurrentLocation();
-                              updateLocation();
+                              await _loadingState();
+                              updateDrawer();
+                              pinCount++;
+                              message = "Your location is saved at $imgOffset.";
                             }
                           : null,
                       child: const Text("Apply"))),
@@ -228,105 +254,47 @@ class CalibrateState extends State<Calibrate> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                  onPressed: isPress
-                      ? null
-                      : () {
-                          setState(() {
-                            offsetShow = "Pin your location on the map";
-                            isPress = true;
-                            pinColor = Colors.red;
-                            index = 0;
-                            if (currentPin.containsKey(index)) {
-                              isUpdate = true;
-                              oldPin = currentPin[index]!;
-                            }
-                          });
-                        },
-                  icon: const Icon(Icons.location_pin,
-                      size: 30, color: Colors.red)),
-              IconButton(
-                  onPressed: isPress
-                      ? null
-                      : () {
-                          setState(() {
-                            offsetShow = "Pin your location on the map";
-                            isPress = true;
-                            pinColor = Colors.green;
-                            index = 1;
-                            if (currentPin.containsKey(index)) {
-                              isUpdate = true;
-                              oldPin = currentPin[index]!;
-                            }
-                          });
-                        },
+              ElevatedButton.icon(
+                  onPressed: pinCount < 5
+                      ? () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text("Select Pin Color"),
+                                  content: BlockPicker(
+                                      pickerColor: pickerColor,
+                                      onColorChanged: colorChange),
+                                  actions: [
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text("Cancel")),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            pinColor = pickerColor;
+                                          });
+                                          message =
+                                              "Mark your location on a map.";
+                                          index = pinCount;
+                                          isPress = true;
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text("OK"))
+                                  ],
+                                );
+                              });
+                        }
+                      : null,
+                  label: const Text("Add Pin"),
                   icon: const Icon(
                     Icons.location_pin,
                     size: 30,
-                    color: Colors.green,
-                  )),
-              IconButton(
-                  onPressed: isPress
-                      ? null
-                      : () {
-                          setState(() {
-                            offsetShow = "Pin your location on the map";
-                            isPress = true;
-                            pinColor = Colors.blue;
-                            index = 2;
-                            if (currentPin.containsKey(index)) {
-                              isUpdate = true;
-                              oldPin = currentPin[index]!;
-                            }
-                          });
-                        },
-                  icon: const Icon(
-                    Icons.location_pin,
-                    size: 30,
-                    color: Colors.blue,
-                  )),
-              IconButton(
-                  onPressed: isPress
-                      ? null
-                      : () {
-                          setState(() {
-                            offsetShow = "Pin your location on the map";
-                            isPress = true;
-                            pinColor = Colors.yellow;
-                            index = 3;
-                            if (currentPin.containsKey(index)) {
-                              isUpdate = true;
-                              oldPin = currentPin[index]!;
-                            }
-                          });
-                        },
-                  icon: const Icon(
-                    Icons.location_pin,
-                    size: 30,
-                    color: Colors.yellow,
-                  )),
-              IconButton(
-                  onPressed: isPress
-                      ? null
-                      : () {
-                          setState(() {
-                            offsetShow = "Pin your location on the map";
-                            isPress = true;
-                            pinColor = Colors.purple;
-                            index = 4;
-                            if (currentPin.containsKey(index)) {
-                              isUpdate = true;
-                              oldPin = currentPin[index]!;
-                            }
-                          });
-                        },
-                  icon: const Icon(
-                    Icons.location_pin,
-                    size: 30,
-                    color: Colors.purple,
                   )),
               const SizedBox(
-                width: 30,
+                width: 20,
               ),
               IconButton(
                 onPressed: () {
@@ -337,14 +305,14 @@ class CalibrateState extends State<Calibrate> {
                       builder: (context) {
                         return StatefulBuilder(builder: (context, setState) {
                           return AlertDialog(
-                            title: Text('Pin Settings'),
+                            title: const Text('Pin Settings'),
                             content: Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Pin Size',
                                   style: TextStyle(fontSize: 20),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 50,
                                 ),
                                 IconButton(
@@ -353,7 +321,7 @@ class CalibrateState extends State<Calibrate> {
                                         newPinSize -= 5;
                                       });
                                     },
-                                    icon: Icon(Icons.remove_circle)),
+                                    icon: const Icon(Icons.remove_circle)),
                                 Text('$newPinSize'),
                                 IconButton(
                                     onPressed: () {
@@ -361,7 +329,7 @@ class CalibrateState extends State<Calibrate> {
                                         newPinSize += 5;
                                       });
                                     },
-                                    icon: Icon(Icons.add_circle)),
+                                    icon: const Icon(Icons.add_circle)),
                               ],
                             ),
                             actions: [
@@ -369,32 +337,31 @@ class CalibrateState extends State<Calibrate> {
                                   onPressed: () {
                                     Navigator.pop(context, 'Cancel');
                                   },
-                                  child: Text('Cancel')),
+                                  child: const Text('Cancel')),
                               OutlinedButton(
                                   onPressed: () {
                                     pinSize = newPinSize;
                                     updatePinSize(newPinSize);
                                     Navigator.pop(context, 'Apply');
                                   },
-                                  child: Text('Apply'))
+                                  child: const Text('Apply'))
                             ],
                           );
                         });
                       });
                 },
-                icon: Icon(Icons.settings),
+                icon: const Icon(Icons.settings),
               ),
             ],
           ),
           const SizedBox(
             height: 10,
           ),
-          Text(offsetShow),
-          Text(location),
-          SizedBox(
+          Text(message),
+          const SizedBox(
             height: 10,
           ),
-          OutlinedButton(
+          ElevatedButton(
               onPressed: () async {
                 await _getCurrentLocation();
                 var current_gp = Matrix.fromList([
@@ -408,19 +375,24 @@ class CalibrateState extends State<Calibrate> {
                   currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
                 });
               },
-              child: Text('Update'))
+              child: const Text('Update'))
         ],
       )),
     );
   }
 
   void updateDrawer() {
+    int thisPin = index;
     pinDetail[index] = PinDetails(
         pinColor: pinColor,
         pinOffset: imgOffset,
         position: currentPosition,
         remove: () {
-          print("test");
+          setState(() {
+            currentPin.remove(thisPin);
+            pinDetail.remove(thisPin);
+            pinCount--;
+          });
         });
   }
 
@@ -432,10 +404,9 @@ class CalibrateState extends State<Calibrate> {
     });
   }
 
-  void updateLocation() {
-    String lx = lat.toStringAsFixed(10);
-    String ly = long.toStringAsFixed(10);
-    location = 'Lat: $lx, Long: $ly';
-    updateDrawer();
+  void colorChange(Color color) {
+    setState(() {
+      pickerColor = color;
+    });
   }
 }

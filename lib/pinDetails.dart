@@ -70,7 +70,7 @@ class PinDetails extends StatelessWidget {
           ),
         ),
         TextButton(
-            onPressed: () => remove,
+            onPressed: () => remove(),
             child: const Column(
               children: [Icon(Icons.delete), Text("Remove")],
             ))
