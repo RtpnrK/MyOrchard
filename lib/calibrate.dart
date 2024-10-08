@@ -42,7 +42,7 @@ class CalibrateState extends State<Calibrate> {
   @override
   void initState() {
     DatabaseHelper().getPins();
-    pins.addAll(DatabaseHelper().getPins() as Iterable);
+    pins.add(DatabaseHelper().getPins());
     super.initState();
   }
 
@@ -132,7 +132,7 @@ class CalibrateState extends State<Calibrate> {
                               longitude: e.position.longitude,
                               offsetX: e.pinOffset.dx,
                               offsetY: e.pinOffset.dy,
-                              color: e.pinColor));
+                              color: e.pinColor.value.toRadixString(16)));
                         });
                         var GP = Matrix.fromList(l1, dtype: DType.float64);
                         var SP = Matrix.fromList(l2, dtype: DType.float64);
@@ -148,7 +148,7 @@ class CalibrateState extends State<Calibrate> {
                             Offset(current_sp[0][0], current_sp[1][0]);
                         log(current_sp.toString());
                         log(current_gp.toString());
-                        
+
                         print("Pins");
                         print(pins);
                       }

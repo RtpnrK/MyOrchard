@@ -9,7 +9,7 @@ class PinM {
   double longitude;
   double offsetX;
   double offsetY;
-  Color color;
+  String color;
   
 
   PinM({
