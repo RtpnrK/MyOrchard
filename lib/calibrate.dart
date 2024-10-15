@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ml_linalg/linalg.dart';
+import 'package:myorchard/model/pinModel.dart';
 import 'package:myorchard/optimize.dart';
 import 'package:myorchard/pin.dart';
 import 'package:myorchard/pinDetails.dart';
+import 'package:myorchard/pinsDB.dart';
+import 'package:sqflite/utils/utils.dart';
 
 class Calibrate extends StatefulWidget {
   final File? image;
@@ -35,6 +38,41 @@ class CalibrateState extends State<Calibrate> {
   late Position currentPosition;
   late double newPinSize;
   late Optimize opt;
+  late List pins = [];
+
+  @override
+  void initState() {
+    DatabaseHelper().getPins();
+    loadData();
+    DatabaseHelper().fetchPins();
+    super.initState();
+  }
+
+  Future<void> loadData() async {
+    List<PinM> pins = await DatabaseHelper().getPins();
+    print("Data Loaded!");
+    setState(() {
+       for (var pin in pins) {
+        pinDetail[pin.id!] = PinDetails(
+        pinColor: colorFromHex(pin.color)!,
+        pinOffset: Offset(pin.offsetX, pin.offsetY),
+        lat: pin.latitude,
+        long: pin.longitude,
+        remove: () {
+          setState(() {
+            currentPin.remove(pin.id);
+            pinDetail.remove(pin.id);
+            pinCount--;
+          });
+        });
+        currentPin[pin.id!] = Pin(
+          imgOffset: Offset(pin.offsetX, pin.offsetY),
+          pinColor: colorFromHex(pin.color)!,
+          pinSize: pinSize);
+    }
+    });
+  
+  }
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled;
@@ -112,11 +150,18 @@ class CalibrateState extends State<Calibrate> {
                     ? () async {
                         List<List<double>> l1 = [[], []];
                         List<List<double>> l2 = [[], []];
+                        DatabaseHelper().deleteAllPins();
                         pinDetail.forEach((i, e) {
-                          l1[0].add(e.position.latitude);
-                          l1[1].add(e.position.longitude);
+                          l1[0].add(e.lat);
+                          l1[1].add(e.long);
                           l2[0].add(e.pinOffset.dx);
                           l2[1].add(e.pinOffset.dy);
+                          DatabaseHelper().insertPin(PinM(
+                              latitude: e.lat,
+                              longitude: e.long,
+                              offsetX: e.pinOffset.dx,
+                              offsetY: e.pinOffset.dy,
+                              color: e.pinColor.value.toRadixString(16)));
                         });
                         var GP = Matrix.fromList(l1, dtype: DType.float64);
                         var SP = Matrix.fromList(l2, dtype: DType.float64);
@@ -132,6 +177,9 @@ class CalibrateState extends State<Calibrate> {
                             Offset(current_sp[0][0], current_sp[1][0]);
                         log(current_sp.toString());
                         log(current_gp.toString());
+
+                        print("Pins");
+                        DatabaseHelper().fetchPins();
                       }
                     : null,
                 label: const Text('Calibrate'),
@@ -255,7 +303,7 @@ class CalibrateState extends State<Calibrate> {
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
-                                        child: const Text("Cancel")),
+                                        child: Text("Cancel")),
                                     ElevatedButton(
                                         onPressed: () {
                                           setState(() {
@@ -353,7 +401,8 @@ class CalibrateState extends State<Calibrate> {
     pinDetail[index] = PinDetails(
         pinColor: pinColor,
         pinOffset: imgOffset,
-        position: currentPosition,
+        lat: currentPosition.latitude,
+        long: currentPosition.longitude,
         remove: () {
           setState(() {
             currentPin.remove(thisPin);

@@ -4,22 +4,23 @@ import 'package:geolocator/geolocator.dart';
 class PinDetails extends StatelessWidget {
   final Color pinColor;
   final Offset pinOffset;
-  final Position position;
+  final double lat;
+  final double long;
   final VoidCallback remove; 
 
   const PinDetails({
     super.key,
     required this.pinColor,
     required this.pinOffset,
-    required this.position,
+    required this.lat,
+    required this.long,
     required this.remove,
   });
 
   @override
   Widget build(BuildContext context) {
-    double lat = position.latitude;
-    double long = position.longitude;
-    TextStyle style = const TextStyle(fontSize: 15);
+
+    TextStyle style = TextStyle(fontSize: 15);
 
     return ExpansionTile(
       title: const Text("Pin"),

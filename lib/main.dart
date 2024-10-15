@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myorchard/home.dart';
 import 'package:myorchard/selectMap.dart';
 
 void main() {
@@ -13,7 +14,9 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-          body:PickerButt(),
+          body:SafeArea(
+            child: Home()
+            ),
         ),
     );
   }
