@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -37,8 +38,9 @@ class CalibrateState extends State<Calibrate> {
   var pinDetail = <int, PinDetails>{};
   late Position currentPosition;
   late double newPinSize;
-  late Optimize opt;
+  Optimize? opt;
   late List pins = [];
+  StreamSubscription<Position>? positionStreamSubscription;
 
   @override
   void initState() {
@@ -130,6 +132,19 @@ class CalibrateState extends State<Calibrate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        onPressed: opt == null? (){
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Please calibrate before get current location'),
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.grey,)
+          );
+        }: (){
+          _startLocationUpdates();
+        },
+        child: const Icon(Icons.gps_fixed),
+      ),
       appBar: AppBar(),
       endDrawer: Drawer(
         child: SafeArea(
@@ -166,13 +181,13 @@ class CalibrateState extends State<Calibrate> {
                         var GP = Matrix.fromList(l1, dtype: DType.float64);
                         var SP = Matrix.fromList(l2, dtype: DType.float64);
                         opt = Optimize(GP, SP);
-                        opt.solve();
+                        opt!.solve();
                         await _loadingState();
                         var current_gp = Matrix.fromList([
                           [lat],
                           [long]
                         ], dtype: DType.float64);
-                        var current_sp = opt.toSP(current_gp);
+                        var current_sp = opt!.toSP(current_gp);
                         currentOffset =
                             Offset(current_sp[0][0], current_sp[1][0]);
                         log(current_sp.toString());
@@ -432,11 +447,23 @@ class CalibrateState extends State<Calibrate> {
       [lat],
       [long]
     ], dtype: DType.float64);
-    var current_sp = opt.toSP(current_gp);
+    var current_sp = opt!.toSP(current_gp);
     log(current_sp.toString());
     log(current_gp.toString());
     setState(() {
       currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
+    });
+  }
+
+  void _startLocationUpdates() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high, 
+      distanceFilter: 1, 
+    );
+
+    positionStreamSubscription = Geolocator.getPositionStream(locationSettings: locationSettings)
+        .listen((Position position) {
+      updateGPS();
     });
   }
 }

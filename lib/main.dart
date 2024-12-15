@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:myorchard/home.dart';
+import 'package:myorchard/manage.dart';
 import 'package:myorchard/selectMap.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.portraitUp
+  ]);
   runApp(const MyApp());
 }
 

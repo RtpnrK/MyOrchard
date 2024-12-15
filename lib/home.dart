@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:myorchard/calibrate.dart';
+import 'package:myorchard/manage.dart';
 import 'package:myorchard/selectMap.dart';
 
 class Profile extends StatelessWidget {
@@ -15,7 +16,7 @@ class Profile extends StatelessWidget {
     return Stack(
       children: [
         Card(
-            elevation: 5,
+            elevation: 20,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             child: SizedBox(
@@ -48,8 +49,9 @@ class Profile extends StatelessWidget {
                       ElevatedButton(
                           onPressed: () {
                             Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => Calibrate(image: img,)));
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const Manage()));
                           },
                           child: const Text('Select',
                               style: TextStyle(fontSize: 18)))
@@ -109,24 +111,29 @@ class EmptyState extends StatelessWidget {
           const SizedBox(
             height: 30,
           ),
-          Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              child: SizedBox(
+          InkWell(
+            customBorder:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const PickerButt()));
+            },
+            child: Card(
+                elevation: 20,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                child: const SizedBox(
                   width: 320,
                   height: 400,
                   child: Center(
-                      child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const PickerButt()));
-                    },
-                    label: const Text('Add New'),
-                    icon: const Icon(Icons.add),
-                  )))),
+                    child: Icon(
+                      Icons.add,
+                      size: 100,
+                      color: Colors.black38,
+                    ),
+                  ),
+                )),
+          )
         ],
       ),
     );
@@ -149,13 +156,41 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     setState(() {
-      print(widget.title);
+      print(widget.img);
       if (widget.img != null && widget.title != null) {
-      profiles.add(Profile(img: widget.img!, title: widget.title!,));
-    }
+        profiles.add(Profile(
+          img: widget.img!,
+          title: widget.title!,
+        ));
+        profiles.insert(profiles.length, 
+        InkWell(
+            customBorder:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const PickerButt()));
+            },
+            child: Card(
+                elevation: 20,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                child: const SizedBox(
+                  width: 320,
+                  height: 400,
+                  child: Center(
+                    child: Icon(
+                      Icons.add,
+                      size: 100,
+                      color: Colors.black38,
+                    ),
+                  ),
+                )),
+          ));
+      }
     });
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,7 +201,7 @@ class _HomeState extends State<Home> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const SizedBox(
-                    height: 20,
+                    height: 50,
                   ),
                   const Text(
                     'My Orchard',
