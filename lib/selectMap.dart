@@ -36,7 +36,9 @@ class _PickerButtState extends State<PickerButt> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(height: 30,),
+              const SizedBox(
+                height: 30,
+              ),
               const Text('Map Image',
                   style: TextStyle(
                     fontSize: 18,
@@ -46,16 +48,22 @@ class _PickerButtState extends State<PickerButt> {
                 height: 20,
               ),
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   pickImage();
                 },
                 child: Container(
+                  clipBehavior: Clip.hardEdge,
                   height: 350,
                   width: 350,
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.black)),
+                  decoration: const BoxDecoration(
+                    color: Colors.black12,
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
                   child: imagFile != null
-                      ? Image.file(imagFile!)
+                      ? Image.file(
+                          imagFile!,
+                          fit: BoxFit.cover,
+                        )
                       : const Icon(
                           Icons.upload,
                           size: 100,
@@ -99,7 +107,10 @@ class _PickerButtState extends State<PickerButt> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Home(img: imagFile, title: _textEditController.text,)),
+                            builder: (context) => Home(
+                                  img: imagFile,
+                                  title: _textEditController.text,
+                                )),
                       );
                     },
                     label: const Text('Create'),

@@ -1,7 +1,13 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:myorchard/activities.dart';
+import 'package:myorchard/calibrate.dart';
 
 class Manage extends StatefulWidget {
-  const Manage({super.key});
+  final File? image;
+  const Manage({super.key, this.image});
 
   @override
   State<Manage> createState() => _ManageState();
@@ -9,14 +15,13 @@ class Manage extends StatefulWidget {
 
 class _ManageState extends State<Manage> {
   late double width, height;
-  int pageIndex = 0;
-  TransformationController viewTranformationController = TransformationController(); 
+  TransformationController viewTranformationController =
+      TransformationController();
 
-@override
+  @override
   void initState() {
-    viewTranformationController = TransformationController(
-      Matrix4.identity()..scale(0.3)
-    );
+    viewTranformationController =
+        TransformationController(Matrix4.identity()..scale(0.3));
     super.initState();
   }
 
@@ -25,391 +30,182 @@ class _ManageState extends State<Manage> {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     return Scaffold(
-      floatingActionButton: Visibility(
-        visible: pageIndex == 0 || pageIndex == 1,
-        child: pageIndex == 0? FloatingActionButton(
-          onPressed: () {},
-          backgroundColor: const Color.fromARGB(255, 2, 172, 135),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-            size: 32,
-          ),
-        ):
-        FloatingActionButton(
-          onPressed: () {},
-          backgroundColor: const Color.fromARGB(255, 0, 62, 148),
-          child: const Icon(
-            Icons.gps_fixed,
-            color: Colors.white,
-            size: 32,)
-        ),
-      ),
-      body: <Widget>[
-        // ######################### Home Page ###########################
-        Stack(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            color: const Color.fromARGB(255, 2, 172, 135),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 60,
-                ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Icon(
-                      Icons.forest_outlined,
-                      color: Colors.white,
-                      size: 60,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Text('Orchard \nManagement',
-                        style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: Container(
-                    width: width,
-                    decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30))),
-                    child: SingleChildScrollView(
-                      child: Center(
-                        child: Column(
-                          children: [
-                            NoteCard(
-                                height: 150,
-                                width: width * 0.9,
-                                image: Image.asset('assets/images/map1.png',
-                                    fit: BoxFit.cover),
-                                title: const Text(
-                                  'Title',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                description: const Text('Description')),
-                            NoteCard(
-                                height: 150,
-                                width: width * 0.9,
-                                image: Image.asset('assets/images/map4.png',
-                                    fit: BoxFit.cover),
-                                title: const Text(
-                                  'Title',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                description: const Text('Description')),
-                          ],
-                        ),
-                      ),
-                    ),
+            decoration: const BoxDecoration(
+              boxShadow: [BoxShadow(
+                color: Colors.black26,
+                blurRadius: 8,
+                spreadRadius: 5,
+                offset: Offset(0, 2)
+              )],
+              color: Color(0xff5D8736),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30)
+              )
+            ),
+            width: width,
+            height: height*0.2,
+            child:  Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 45,
+                    child:  Image.asset('assets/logo/Logo.png'),
                   ),
-                )
-              ],
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  const Text('Orchard\nManagement',
+                      style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
+                ],
+              ),
             ),
           ),
-          Positioned(
-              right: 10,
-              top: 60,
-              child: PopupMenuButton(
-                  icon: const Icon(
-                    Icons.more_horiz,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-                  itemBuilder: (BuildContext context) => [
-                        const PopupMenuItem(child: Text('Select All')),
-                        const PopupMenuItem(child: Text('Upload to CSV')),
-                        const PopupMenuItem(child: Text('Delete'))
-                      ]))
-        ],
-      ),
-      // ########################### Map Page ###########################
-      Stack(
-        children: [
-          Container(
-            color: const Color.fromARGB(255, 2, 172, 135),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 60,
-                ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Icon(
-                      Icons.forest_outlined,
-                      color: Colors.white,
-                      size: 50,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Text('Orchard Management',
-                        style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: Container(
-                    width: width,
-                    decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30))),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 30),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const Text('Live Map',style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Expanded(
-                              child: SizedBox(
-                                width: width*0.95,
-                                child: InteractiveViewer(
-                                  transformationController: viewTranformationController,
-                                  minScale: 0.1,
-                                  maxScale: 0.5,
-                                  constrained: false,
-                                  child: Image.asset('assets/images/map1.png')),
-                            ))
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-      // ##################### Log Page ########################
-      Stack(
-        children: [
-          Container(
-            color: const Color.fromARGB(255, 2, 172, 135),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 60,
-                ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Icon(
-                      Icons.forest_outlined,
-                      color: Colors.white,
-                      size: 50,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Text('Orchard Management',
-                        style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: Container(
-                    width: width,
-                    decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30))),
-                    child: const Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 30),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text('Log Page')
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-      // ####################### Profile Page #############################
-       Stack(
-        children: [
-          Container(
-            color: const Color.fromARGB(255, 2, 172, 135),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 60,
-                ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Icon(
-                      Icons.forest_outlined,
-                      color: Colors.white,
-                      size: 50,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Text('Orchard Management',
-                        style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: Container(
-                    width: width,
-                    decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30))),
-                    child: const Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 30),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text('Profile Page')
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-      ][pageIndex],
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (index) {
-          setState(() {
-             pageIndex = index;
-          });
-        },
-        destinations: const [
-        NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
-        NavigationDestination(
-            icon: Icon(Icons.navigation_outlined), label: 'Map'),
-        NavigationDestination(icon: Icon(Icons.chat_outlined), label: 'Log'),
-        NavigationDestination(
-            icon: Icon(Icons.person_2_outlined), label: 'Profile'),
-      ],
-      selectedIndex: pageIndex,),
-    );
-  }
-}
-
-// Card template
-class NoteCard extends StatelessWidget {
-  final double height;
-  final double width;
-  final Image image;
-  final Text title;
-  final Text description;
-  final VoidCallback? onTap;
-  const NoteCard(
-      {super.key,
-      required this.height,
-      required this.width,
-      required this.image,
-      required this.title,
-      required this.description,
-      this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      width: width,
-      child: Card(
-        margin: const EdgeInsets.only(top: 20),
-        elevation: 8,
-        child: InkWell(
-          onTap: onTap,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+          const SizedBox(height: 20),
+          Column(
             children: [
-              Container(
-                width: 120,
-                height: 150,
-                decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        bottomLeft: Radius.circular(10))),
-                child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        bottomLeft: Radius.circular(10)),
-                    child: image),
+              const SizedBox(
+                height: 50,
+              ),
+              // Activities
+              Card(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(40))),
+                color: const Color(0xffA9C46C),
+                elevation: 8,
+                child: InkWell(
+                  customBorder: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(40))),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Activities()));
+                  },
+                  child: SizedBox(
+                    width: width * 0.9,
+                    height: height * 0.13,
+                    child: const Row(
+                      children: [
+                        SizedBox(
+                          width: 30,
+                        ),
+                        ImageIcon(
+                          AssetImage('assets/icons/gardening.png'),
+                          color: Colors.white,
+                          size: 50,),
+                        SizedBox(
+                          width: 30,
+                        ),
+                        Text(
+                          'Activities',
+                          style: TextStyle(
+                              fontSize: 30,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(
-                width: 10,
+                height: 50,
               ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      height: 10,
+              // Map
+              Card(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(40))),
+                color: const Color(0xff577BC1),
+                elevation: 8,
+                child: InkWell(
+                  customBorder: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(40))),
+                  onTap: () {
+                    Navigator.push(context,
+                     MaterialPageRoute(builder: (context) => Calibrate(image: widget.image,)));
+                  },
+                  child: SizedBox(
+                    width: width * 0.9,
+                    height: height * 0.13,
+                    child: const Row(
+                      children: [
+                        SizedBox(
+                          width: 30,
+                        ),
+                        ImageIcon(
+                          AssetImage('assets/icons/map.png'),
+                          color: Colors.white,
+                          size: 50,),
+                        SizedBox(
+                          width: 30,
+                        ),
+                        Text(
+                          'Map',
+                          style: TextStyle(
+                              fontSize: 30,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        )
+                      ],
                     ),
-                    title,
-                    description,
-                  ],
+                  ),
                 ),
-              )
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              // Chat
+              Card(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(40))),
+                color: const Color(0xffD0DDD0),
+                elevation: 8,
+                child: InkWell(
+                  customBorder: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(40))),
+                  onTap: () {},
+                  child: SizedBox(
+                    width: width * 0.9,
+                    height: height * 0.13,
+                    child:  const Row(
+                      children: [
+                        SizedBox(
+                          width: 30,
+                        ),
+                        ImageIcon(
+                          AssetImage('assets/icons/messenger.png'),
+                          color: Colors.black,
+                          size: 50,),
+                        SizedBox(
+                          width: 30,
+                        ),
+                        Text(
+                          'Chat',
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
-          ),
-        ),
+          )
+        ],
       ),
     );
-  }
+  } 
 }

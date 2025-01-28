@@ -13,79 +13,7 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Card(
-            elevation: 20,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            child: SizedBox(
-              width: 320,
-              height: 400,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  CircleAvatar(
-                    radius: 85,
-                    foregroundImage: FileImage(img),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () {},
-                          child: const Text('Edit',
-                              style: TextStyle(fontSize: 18))),
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Manage()));
-                          },
-                          child: const Text('Select',
-                              style: TextStyle(fontSize: 18)))
-                    ],
-                  )
-                ],
-              ),
-            )),
-        Positioned(
-            top: 10,
-            right: 10,
-            child: IconButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                            title: const Text(
-                                'Are you sure you want to remove this map?'),
-                            actions: [
-                              ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('No',
-                                      style: TextStyle(fontSize: 18))),
-                              ElevatedButton(
-                                  onPressed: () {},
-                                  child: const Text('Yes',
-                                      style: TextStyle(fontSize: 18)))
-                            ],
-                          ));
-                },
-                icon: const Icon(Icons.clear)))
-      ],
+    return Card(
     );
   }
 }
@@ -111,18 +39,18 @@ class EmptyState extends StatelessWidget {
           const SizedBox(
             height: 30,
           ),
-          InkWell(
-            customBorder:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const PickerButt()));
-            },
-            child: Card(
-                elevation: 20,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-                child: const SizedBox(
+          Card(
+            elevation: 20,
+            shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+            child: InkWell(
+              customBorder:
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const PickerButt()));
+              },
+              child: const SizedBox(
                   width: 320,
                   height: 400,
                   child: Center(
@@ -132,7 +60,8 @@ class EmptyState extends StatelessWidget {
                       color: Colors.black38,
                     ),
                   ),
-                )),
+                ),
+            ),
           )
         ],
       ),
@@ -150,7 +79,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Widget> profiles = [];
+  final List<Widget> profiles = [
+
+  ];
   int pageIndex = 0;
 
   @override
@@ -163,18 +94,18 @@ class _HomeState extends State<Home> {
           title: widget.title!,
         ));
         profiles.insert(profiles.length, 
-        InkWell(
+        Card(
+          elevation: 20,
+          shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+          child: InkWell(
             customBorder:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const PickerButt()));
-            },
-            child: Card(
-                elevation: 20,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-                child: const SizedBox(
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const PickerButt()));
+              },
+            child: const SizedBox(
                   width: 320,
                   height: 400,
                   child: Center(
@@ -184,8 +115,9 @@ class _HomeState extends State<Home> {
                       color: Colors.black38,
                     ),
                   ),
-                )),
-          ));
+                ),
+          ),
+        ));
       }
     });
     super.initState();
