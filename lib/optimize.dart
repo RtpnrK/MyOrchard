@@ -1,6 +1,7 @@
-import 'dart:math';
 import 'package:ml_linalg/linalg.dart';
+
 import 'normalize.dart';
+
 
 class Optimize {
   var GP;

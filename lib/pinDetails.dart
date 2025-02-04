@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 
 class PinDetails extends StatelessWidget {
   final Color pinColor;
@@ -35,7 +34,7 @@ class PinDetails extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
             child: Text(
-              "Px: ${pinOffset.dx}",
+              "Px: ${pinOffset.dx.toStringAsFixed(2)}",
               style: style,
             ),
           ),
@@ -45,7 +44,7 @@ class PinDetails extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
             child: Text(
-              "Py: ${pinOffset.dy}",
+              "Py: ${pinOffset.dy.toStringAsFixed(2)}",
               style: style,
             ),
           ),

@@ -1,15 +1,15 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ml_linalg/linalg.dart';
-import 'package:myorchard/model/pinModel.dart';
+import 'package:myorchard/models/pinModel.dart';
 import 'package:myorchard/optimize.dart';
 import 'package:myorchard/pin.dart';
 import 'package:myorchard/pinDetails.dart';
 import 'package:myorchard/pinsDB.dart';
-import 'package:sqflite/utils/utils.dart';
 
 class Calibrate extends StatefulWidget {
   final File? image;
@@ -37,8 +37,9 @@ class CalibrateState extends State<Calibrate> {
   var pinDetail = <int, PinDetails>{};
   late Position currentPosition;
   late double newPinSize;
-  late Optimize opt;
+  Optimize? opt;
   late List pins = [];
+  StreamSubscription<Position>? positionStreamSubscription;
 
   @override
   void initState() {
@@ -107,7 +108,7 @@ class CalibrateState extends State<Calibrate> {
 
     currentPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    Navigator.of(context).pop;
+        
     setState(() {
       lat = currentPosition.latitude;
       long = currentPosition.longitude;
@@ -130,6 +131,19 @@ class CalibrateState extends State<Calibrate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        onPressed: opt == null? (){
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Please calibrate before get current location'),
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.grey,)
+          );
+        }: (){
+          _startLocationUpdates();
+        },
+        child: const Icon(Icons.gps_fixed),
+      ),
       appBar: AppBar(),
       endDrawer: Drawer(
         child: SafeArea(
@@ -145,7 +159,7 @@ class CalibrateState extends State<Calibrate> {
               ),
               ...pinDetail.values,
               const SizedBox(height: 20),
-              ElevatedButton(
+              ElevatedButton.icon(
                 onPressed: pinDetail.length >= 3
                     ? () async {
                         List<List<double>> l1 = [[], []];
@@ -166,13 +180,13 @@ class CalibrateState extends State<Calibrate> {
                         var GP = Matrix.fromList(l1, dtype: DType.float64);
                         var SP = Matrix.fromList(l2, dtype: DType.float64);
                         opt = Optimize(GP, SP);
-                        opt.solve();
-                        await _getCurrentLocation();
+                        opt!.solve();
+                        await _loadingState();
                         var current_gp = Matrix.fromList([
                           [lat],
                           [long]
                         ], dtype: DType.float64);
-                        var current_sp = opt.toSP(current_gp);
+                        var current_sp = opt!.toSP(current_gp);
                         currentOffset =
                             Offset(current_sp[0][0], current_sp[1][0]);
                         log(current_sp.toString());
@@ -182,7 +196,8 @@ class CalibrateState extends State<Calibrate> {
                         DatabaseHelper().fetchPins();
                       }
                     : null,
-                child: const Text('Calibrate'),
+                label: const Text('Calibrate'),
+                icon: const Icon(Icons.compass_calibration),
               )
             ],
           ),
@@ -196,8 +211,11 @@ class CalibrateState extends State<Calibrate> {
             margin: const EdgeInsets.all(10),
             width: 400,
             height: 350,
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.black), color: Colors.black),
+            decoration: const BoxDecoration(
+              boxShadow: [
+                BoxShadow(color: Color.fromRGBO(64, 64, 64, 1), blurRadius: 10)
+              ],
+            ),
             child: InteractiveViewer(
               minScale: 0.1,
               maxScale: 2.0,
@@ -227,7 +245,7 @@ class CalibrateState extends State<Calibrate> {
                               widget.image!,
                             ),
                           )
-                        : Image.asset("assets/images/map1.png",
+                        : Image.asset("assets/images/map_MyOrchard.jpg",
                             fit: BoxFit.contain),
                     ...currentPin.values,
                     Positioned(
@@ -279,7 +297,7 @@ class CalibrateState extends State<Calibrate> {
                       child: const Text("Apply"))),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -384,27 +402,9 @@ class CalibrateState extends State<Calibrate> {
             ],
           ),
           const SizedBox(
-            height: 10,
+            height: 30,
           ),
           Text(message),
-          const SizedBox(
-            height: 10,
-          ),
-          ElevatedButton(
-              onPressed: () async {
-                await _getCurrentLocation();
-                var current_gp = Matrix.fromList([
-                  [lat],
-                  [long]
-                ], dtype: DType.float64);
-                var current_sp = opt.toSP(current_gp);
-                log(current_sp.toString());
-                log(current_gp.toString());
-                setState(() {
-                  currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
-                });
-              },
-              child: const Text('Update'))
         ],
       )),
     );
@@ -437,6 +437,32 @@ class CalibrateState extends State<Calibrate> {
   void colorChange(Color color) {
     setState(() {
       pickerColor = color;
+    });
+  }
+
+  Future<void> updateGPS() async {
+    await _getCurrentLocation();
+    var current_gp = Matrix.fromList([
+      [lat],
+      [long]
+    ], dtype: DType.float64);
+    var current_sp = opt!.toSP(current_gp);
+    log(current_sp.toString());
+    log(current_gp.toString());
+    setState(() {
+      currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
+    });
+  }
+
+  void _startLocationUpdates() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high, 
+      distanceFilter: 1, 
+    );
+
+    positionStreamSubscription = Geolocator.getPositionStream(locationSettings: locationSettings)
+        .listen((Position position) {
+      updateGPS();
     });
   }
 }
