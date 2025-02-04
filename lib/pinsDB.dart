@@ -1,7 +1,7 @@
 // database_helper.dart
 import 'dart:async';
 import 'dart:io';
-import 'package:myorchard/model/pinModel.dart';
+import 'package:myorchard/models/pinModel.dart';
 
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';

@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:myorchard/calibrate.dart';
 import 'package:myorchard/home.dart';
 
 class PickerButt extends StatefulWidget {
-  const PickerButt({super.key});
+  const PickerButt({
+    super.key,
+  });
 
   @override
   State<PickerButt> createState() => _PickerButtState();
@@ -52,17 +53,14 @@ class _PickerButtState extends State<PickerButt> {
                   pickImage();
                 },
                 child: Container(
-                  clipBehavior: Clip.hardEdge,
                   height: 350,
                   width: 350,
-                  decoration: const BoxDecoration(
-                    color: Colors.black12,
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.black)),
                   child: imagFile != null
                       ? Image.file(
                           imagFile!,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                         )
                       : const Icon(
                           Icons.upload,

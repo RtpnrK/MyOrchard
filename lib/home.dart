@@ -1,10 +1,11 @@
 import 'dart:io';
 
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:myorchard/calibrate.dart';
 import 'package:myorchard/manage.dart';
 import 'package:myorchard/selectMap.dart';
+
 
 class Profile extends StatelessWidget {
   const Profile({super.key, required this.img, required this.title});

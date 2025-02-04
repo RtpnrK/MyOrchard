@@ -5,12 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ml_linalg/linalg.dart';
-import 'package:myorchard/model/pinModel.dart';
+import 'package:myorchard/models/pinModel.dart';
 import 'package:myorchard/optimize.dart';
 import 'package:myorchard/pin.dart';
 import 'package:myorchard/pinDetails.dart';
 import 'package:myorchard/pinsDB.dart';
-import 'package:sqflite/utils/utils.dart';
 
 class Calibrate extends StatefulWidget {
   final File? image;
@@ -246,7 +245,7 @@ class CalibrateState extends State<Calibrate> {
                               widget.image!,
                             ),
                           )
-                        : Image.asset("assets/images/map1.png",
+                        : Image.asset("assets/images/map_MyOrchard.jpg",
                             fit: BoxFit.contain),
                     ...currentPin.values,
                     Positioned(

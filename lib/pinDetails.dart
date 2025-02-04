@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 
 class PinDetails extends StatelessWidget {
   final Color pinColor;
