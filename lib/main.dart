@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:myorchard/components/nav_bar.dart';
+import 'package:myorchard/home.dart';
 import 'package:myorchard/pages/activities.dart';
 import 'package:myorchard/pages/profile.dart';
 import 'package:myorchard/providers/profile_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+ WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -49,11 +53,26 @@ class MyApp extends StatelessWidget {
                       fontSize: 40.sp,
                       fontWeight: FontWeight.w600,
                       color: Color.fromRGBO(98, 114, 84, 1)),
+                ),
+                fontFamily: 'Mitr',
+                cardTheme: CardTheme(
+                  elevation: 5,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(22.5))
+                  ),
+                ),
+                elevatedButtonTheme: ElevatedButtonThemeData(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(Color.fromRGBO(98, 114, 84, 1)),
+                    iconColor: WidgetStatePropertyAll(Colors.white),
+                    foregroundColor: WidgetStatePropertyAll(Colors.white)
+                  )
                 )),
             home: child,
           );
         },
-        child: const NavBar(),
+        child: const ProfileMap(),
       ),
     );
   }
