@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:myorchard/components/nav_bar.dart';
 import 'package:myorchard/pages/activities.dart';
 import 'package:myorchard/pages/profile.dart';
 import 'package:myorchard/providers/profile_provider.dart';
@@ -52,7 +53,7 @@ class MyApp extends StatelessWidget {
             home: child,
           );
         },
-        child: const Activities(),
+        child: const NavBar(),
       ),
     );
   }
