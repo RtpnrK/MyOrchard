@@ -33,10 +33,6 @@ dependencies:
   image_picker: ^1.1.2
   flutter:
     sdk: flutter
-
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   geolocator: ^12.0.0
   ml_linalg: ^13.12.6
@@ -44,6 +40,8 @@ dependencies:
   path_provider: ^2.1.4
   carousel_slider: ^5.0.0
   google_fonts: ^6.2.1
+  flutter_screenutil: ^5.9.3
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -69,18 +67,24 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    # Image
     - assets/images/map1.png
     - assets/images/map2.png
     - assets/images/map3.png
     - assets/images/map4.png
     - assets/images/map5.png
     - assets/images/appName.png
+    - assets/images/appName2.png
+    - assets/images/logo_MyOrchard.png
+    # Logo Icon
     - assets/logo/Logo.png
+    # Assets Icon
     - assets/icons/csv.png
     - assets/icons/gardening.png
     - assets/icons/map.png
-    - assets/icons/measurement.png
+    - assets/icons/calibrate.png
     - assets/icons/messenger.png
+    - assets/icons/upload.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -94,16 +98,17 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Merriweather
+    - family: Mitr
       fonts:
-        - asset: assets/fonts/Merriweather-Regular.ttf
-        - asset: assets/fonts/Merriweather-Italic.ttf
-          style: italic
-        - asset: assets/fonts/Merriweather-Bold.ttf
+        - asset: assets/fonts/Mitr-Regular.ttf
+        - asset: assets/fonts/Mitr-SemiBold.ttf
           weight: 700
-        - asset: assets/fonts/Merriweather-BoldItalic.ttf
-          weight: 700
-          style: italic
+
+          
+    - family: CustomIcons
+      fonts:
+        - asset: assets/customIcons/CustomIcons.ttf
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

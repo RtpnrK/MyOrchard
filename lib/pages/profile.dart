@@ -17,6 +17,8 @@ class ProfileMap extends StatefulWidget {
 
 class _ProfileMapState extends State<ProfileMap> {
   int indexes = 0;
+  CarouselSliderController _sliderController = CarouselSliderController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,14 +28,15 @@ class _ProfileMapState extends State<ProfileMap> {
         title: Center(
             child: Image.asset(
           'assets/images/logo_MyOrchard.png',
-          height: 78.h,
-          width: 340.w,
+          height: 100.h,
+          width: 360.w,
         )),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           CarouselSlider(
+            carouselController: _sliderController,
             options: CarouselOptions(
                 height: 450.h,
                 enlargeCenterPage: true,
@@ -47,48 +50,56 @@ class _ProfileMapState extends State<ProfileMap> {
                     (index) => Stack(
                       children: [
                         Card(
+                            child: SizedBox(
+                          width: 320.w,
+                          height: 450.h,
                           child: InkWell(
                             onTap: () {
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) {
-                                return Activities();
-                              }));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Activities(
+                                            image: File(context
+                                                .watch<ProfileProvider>()
+                                                .list_profiles[index]
+                                                .image),
+                                          )));
                             },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(22.5),
-                              ),
-                              child: Column(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(22.5),
-                                        topRight: Radius.circular(22.5)),
-                                    child: Image.file(
-                                        File(
-                                          context
-                                              .watch<ProfileProvider>()
-                                              .list_profiles[index]
-                                              .image,
-                                        ),
-                                        fit: BoxFit.cover,
-                                        height: 302.h,
-                                        width: 316.w),
-                                  ),
-                                  SizedBox(
-                                    height: 15.h,
-                                  ),
-                                  Text(
-                                    context.watch<ProfileProvider>().list_profiles[index].name,
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge,
-                                  ),
-                                ],
-                              ),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Ink(
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(22.5),
+                                              topRight: Radius.circular(22.5)),
+                                          image: DecorationImage(
+                                              image: FileImage(File(
+                                                context
+                                                    .watch<ProfileProvider>()
+                                                    .list_profiles[index]
+                                                    .image,
+                                              )),
+                                              fit: BoxFit.cover)),
+                                    )),
+                                Expanded(
+                                    flex: 1,
+                                    child: Center(
+                                      child: Text(
+                                        context
+                                            .watch<ProfileProvider>()
+                                            .list_profiles[index]
+                                            .name,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge,
+                                      ),
+                                    ))
+                              ],
                             ),
                           ),
-                        ),
+                        )),
                         Positioned(
                           top: 8.0,
                           right: 8.0,
@@ -99,11 +110,15 @@ class _ProfileMapState extends State<ProfileMap> {
                                 size: 40.sp,
                               ),
                               onPressed: () {
-                                // Handle delete action
-                                context.read<ProfileProvider>().removeProfile(
+                                setState(() {
+                                  _sliderController.previousPage();
+                                  context.read<ProfileProvider>().removeProfile(
                                     context
                                         .read<ProfileProvider>()
                                         .list_profiles[index]);
+                                });
+                                // Handle delete action
+                                
                               }),
                         ),
                       ],
@@ -132,7 +147,9 @@ class _ProfileMapState extends State<ProfileMap> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              for (int i = 0; i < context.watch<ProfileProvider>().list_profiles.length; i++)
+              for (int i = 0;
+                  i < context.watch<ProfileProvider>().list_profiles.length;
+                  i++)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
                   child: Container(
@@ -140,7 +157,9 @@ class _ProfileMapState extends State<ProfileMap> {
                     height: indexes == i ? 15 : 10,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(100),
-                      color: indexes == i ? Theme.of(context).colorScheme.secondary : Colors.grey,
+                      color: indexes == i
+                          ? Theme.of(context).colorScheme.secondary
+                          : Colors.grey,
                     ),
                   ),
                 ),

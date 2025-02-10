@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:myorchard/activities.dart';
-import 'package:myorchard/calibeate.dart';
+import 'package:myorchard/calibrate.dart';
 
 class Manage extends StatefulWidget {
   final File? image;
