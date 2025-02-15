@@ -1,198 +1,145 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:myorchard/pages/activities.dart';
-import 'package:myorchard/pages/createProfile.dart';
-import 'package:myorchard/providers/profile_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:myorchard/custom_icons/customIcons.dart';
+import 'package:myorchard/pages/edit_profile.dart';
 
-class ProfileMap extends StatefulWidget {
-  const ProfileMap({super.key});
+class Profile extends StatefulWidget {
+  final File image;
+  final String name;
+  final List? plots;
+  final int idMap;
+  const Profile(
+      {super.key,
+      required this.image,
+      required this.name,
+      this.plots,
+      required this.idMap});
 
   @override
-  State<ProfileMap> createState() => _ProfileMapState();
+  State<Profile> createState() => _ProfileState();
 }
 
-class _ProfileMapState extends State<ProfileMap> {
-  int indexes = 0;
-  CarouselSliderController _sliderController = CarouselSliderController();
-
+class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        toolbarHeight: 100.h,
-        title: Center(
-            child: Image.asset(
-          'assets/images/logo_MyOrchard.png',
-          height: 100.h,
-          width: 360.w,
-        )),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          CarouselSlider(
-            carouselController: _sliderController,
-            options: CarouselOptions(
-                height: 450.h,
-                enlargeCenterPage: true,
-                enableInfiniteScroll: false,
-                onPageChanged: (index, reason) => setState(() {
-                      indexes = index;
-                    })),
-            items: context.watch<ProfileProvider>().list_profiles.isNotEmpty
-                ? List.generate(
-                    context.watch<ProfileProvider>().list_profiles.length,
-                    (index) => Stack(
-                      children: [
-                        Card(
-                            child: SizedBox(
-                          width: 320.w,
-                          height: 450.h,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Activities(
-                                            image: File(context
-                                                .watch<ProfileProvider>()
-                                                .list_profiles[index]
-                                                .image),
-                                          )));
-                            },
-                            child: Column(
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Ink(
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(22.5),
-                                              topRight: Radius.circular(22.5)),
-                                          image: DecorationImage(
-                                              image: FileImage(File(
-                                                context
-                                                    .watch<ProfileProvider>()
-                                                    .list_profiles[index]
-                                                    .image,
-                                              )),
-                                              fit: BoxFit.cover)),
-                                    )),
-                                Expanded(
-                                    flex: 1,
-                                    child: Center(
-                                      child: Text(
-                                        context
-                                            .watch<ProfileProvider>()
-                                            .list_profiles[index]
-                                            .name,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge,
-                                      ),
-                                    ))
-                              ],
-                            ),
-                          ),
-                        )),
-                        Positioned(
-                          top: 8.0,
-                          right: 8.0,
-                          child: IconButton(
-                              icon: Icon(
-                                Icons.cancel_sharp,
-                                color: Theme.of(context).colorScheme.error,
-                                size: 40.sp,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _sliderController.previousPage();
-                                  context.read<ProfileProvider>().removeProfile(
-                                    context
-                                        .read<ProfileProvider>()
-                                        .list_profiles[index]);
-                                });
-                                // Handle delete action
-                                
-                              }),
-                        ),
-                      ],
-                    ),
-                  )
-                : [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("ยังไม่ได้สร้างโปรไฟล์",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.error)),
-                        Text("สร้างโปรไฟล์เพื่อเริ่มต้นใช้งาน",
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelLarge
-                                ?.copyWith(color: Colors.black.withValues())),
-                      ],
-                    )
-                  ],
+        leading: Padding(
+          padding: EdgeInsets.only(top: 12.h, left: 10.w),
+          child: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              size: 40.h,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        ),
+        backgroundColor: Colors.white,
+        title: Text(
+          "โปรไฟล์",
+          style: Theme.of(context).textTheme.headlineLarge,
+        ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(top: 12.h, right: 18.w),
+            child: IconButton(
+              icon: Icon(
+                CustomIcons.edit,
+                size: 38.sp,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+              onPressed: () {
+                print("ID : ${widget.idMap}");
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return EditProfile(
+                    image: widget.image,
+                    name: widget.name,
+                    plots: widget.plots,
+                    idMap: widget.idMap,
+                  );
+                }));
+              },
+            ),
+          ),
+        ],
+        toolbarHeight: 100.h,
+      ),
+      body: Padding(
+        padding: EdgeInsets.only(top: 10.h),
+        child: Center(
+          child: Column(
             children: [
-              for (int i = 0;
-                  i < context.watch<ProfileProvider>().list_profiles.length;
-                  i++)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+              Card(
+                child: Container(
+                  height: 300.h,
+                  width: 360.w,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(22.5)),
+                      image: DecorationImage(
+                          image: FileImage(widget.image), fit: BoxFit.cover)),
+                ),
+              ),
+              Spacer(),
+              Card(
                   child: Container(
-                    width: indexes == i ? 15 : 10,
-                    height: indexes == i ? 15 : 10,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100),
-                      color: indexes == i
-                          ? Theme.of(context).colorScheme.secondary
-                          : Colors.grey,
-                    ),
+                width: 360.w,
+                height: 365.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(22.5),
                   ),
                 ),
+                child: Padding(
+                  padding: EdgeInsets.only(top: 20.h, left: 25.w),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            "ชื่อ : ",
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          widget.name.isEmpty
+                              ? Text("ไม่ได้ใส่ข้อมูล")
+                              : Text(
+                                  widget.name,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                )
+                        ],
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "แปลง : ",
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          Expanded(
+                            child: SizedBox(
+                              height: 235.h,
+                              child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: widget.plots!.length,
+                                  itemBuilder: (context, index) {
+                                    return Text(widget.plots![index]);
+                                  }),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ))
             ],
           ),
-          SizedBox(
-              height: 62.h,
-              width: 256.w,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return Createprofile();
-                  }));
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.edit,
-                        color: Theme.of(context).colorScheme.surface,
-                        size: 24.sp),
-                    SizedBox(width: 8.w),
-                    Text(
-                      'สร้างโปรไฟล์',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.surface),
-                    ),
-                  ],
-                ),
-              )),
-        ],
+        ),
       ),
     );
   }

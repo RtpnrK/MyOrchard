@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ActivityDetail extends StatefulWidget {
   const ActivityDetail({super.key});
@@ -20,7 +21,7 @@ class _ActivityDetailState extends State<ActivityDetail> {
             width: width,
             height: height * 0.36,
             child: Image.asset(
-              'assets/images/map1.png',
+              'assets/images/tree.jpg',
               fit: BoxFit.cover,
             ),
           ),
@@ -119,7 +120,11 @@ class _ActivityDetailState extends State<ActivityDetail> {
               onPressed: (){
                 Navigator.pop(context);
               }, 
-              icon: const Icon(Icons.arrow_back_ios, size: 36,)))
+              icon:Icon(
+              Icons.arrow_back_ios,
+              size: 40.h,
+              color: Theme.of(context).colorScheme.secondary,
+            ),))
         ],
       ),
     );
