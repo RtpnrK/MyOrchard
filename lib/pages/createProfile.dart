@@ -199,9 +199,7 @@ class _CreateprofileState extends State<Createprofile> {
                           splashColor: Colors.transparent,
                           onTap: () {
                             setState(() {
-                              listPlotController.add(TextEditingController(
-                                  text:
-                                      'แปลงที่ ${listPlotController.length + 1}'));
+                              listPlotController.add(TextEditingController());
                             });
                           },
                           child: Padding(

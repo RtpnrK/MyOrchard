@@ -53,8 +53,27 @@ class _ActivitiesState extends State<Activities> {
               padding: EdgeInsets.only(top: 12.h),
               child: TextButton.icon(
                 onPressed: (){
-                  Navigator.push(context,
-                   MaterialPageRoute(builder: (context) => Calibrate2()));
+                  showDialog(
+                    context: context, 
+                    builder: (context) => AlertDialog(
+                      title: Text('เลือกโปรไฟล์การปรับเทียบ'),
+                      content: SizedBox(
+                        height: 300.h,
+                        child: Column(
+                          children: [
+                            ListTile(
+                              leading: Icon(Icons.add),
+                              title: Text('เพิ่มการปรับเทียบ'),
+                              onTap: (){
+                                Navigator.of(context).pop();
+                                Navigator.push(context,
+                                 MaterialPageRoute(builder: (context) => Calibrate2(image: widget.image!, scale: scaleFactor,)));
+                              },
+                            )
+                          ],
+                        ),
+                      )
+                    ));
                 },
                 label: Text('ปรับเทียบ'),
                 iconAlignment: IconAlignment.end,
@@ -116,7 +135,7 @@ class _ActivitiesState extends State<Activities> {
         bottomNavigationBar: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 20),
+              padding: EdgeInsets.only(top: 20.h),
               child: Container(
                 height: 75.h,
                 width: double.infinity,
@@ -206,7 +225,7 @@ class _ActivitiesState extends State<Activities> {
           // ################ Map #################
           Center(
               child: InteractiveViewer(
-                  minScale: scaleFactor,
+                  minScale: 0.2,
                   transformationController: viewTranformationController,
                   constrained: false,
                   child: Image(image: FileImage(widget.image!)))),

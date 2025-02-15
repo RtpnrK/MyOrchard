@@ -72,8 +72,8 @@ class _ProfileMapState extends State<ProfileMap> {
                                     child: Ink(
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(22.5),
-                                              topRight: Radius.circular(22.5)),
+                                              topLeft: Radius.circular(22.5.w),
+                                              topRight: Radius.circular(22.5.w)),
                                           image: DecorationImage(
                                               image: FileImage(File(
                                                 context

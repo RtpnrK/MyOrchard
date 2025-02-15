@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:myorchard/home.dart';
-import 'package:myorchard/pages/activities.dart';
 import 'package:myorchard/pages/profile.dart';
 import 'package:myorchard/providers/profile_provider.dart';
 import 'package:provider/provider.dart';
@@ -35,16 +33,16 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
                 useMaterial3: true,
                 colorScheme: ColorScheme.fromSeed(
-                  seedColor: Color.fromRGBO(98, 114, 84, 1),
-                  primary: Color.fromRGBO(98, 114, 84, 1),
-                  secondary: Color.fromRGBO(128, 157, 60, 1),
-                  surface: Color.fromRGBO(238, 238, 238, 1),
+                  seedColor: const Color.fromRGBO(98, 114, 84, 1),
+                  primary: const Color.fromRGBO(98, 114, 84, 1),
+                  secondary: const Color.fromRGBO(128, 157, 60, 1),
+                  surface: const Color.fromRGBO(238, 238, 238, 1),
                 ),
                 textTheme: TextTheme(
                   titleLarge: TextStyle(
                       fontSize: 28.sp,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(66, 65, 65, 1)),
+                      color: const Color.fromRGBO(66, 65, 65, 1)),
                   labelLarge: TextStyle(
                       fontSize: 20.sp,
                       fontWeight: FontWeight.w600,
@@ -52,10 +50,17 @@ class MyApp extends StatelessWidget {
                   headlineLarge: TextStyle(
                       fontSize: 40.sp,
                       fontWeight: FontWeight.w600,
-                      color: Color.fromRGBO(98, 114, 84, 1)),
+                      color: const Color.fromRGBO(98, 114, 84, 1)),
+                  headlineMedium: TextStyle(
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.w600,
+                      color: const Color.fromRGBO(98, 114, 84, 1)),
+                  displayMedium: TextStyle(
+                      fontSize: 20.sp,
+                      color: const Color.fromRGBO(98, 114, 84, 1)),
                 ),
                 fontFamily: 'Mitr',
-                cardTheme: CardTheme(
+                cardTheme: const CardTheme(
                   elevation: 5,
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -63,10 +68,13 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
                 elevatedButtonTheme: ElevatedButtonThemeData(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(Color.fromRGBO(98, 114, 84, 1)),
-                    iconColor: WidgetStatePropertyAll(Colors.white),
-                    foregroundColor: WidgetStatePropertyAll(Colors.white)
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(98, 114, 84, 1),
+                    foregroundColor: Colors.white,
+                    iconColor: Colors.white,
+                    disabledBackgroundColor: Colors.grey,
+                    disabledForegroundColor: Colors.white,
+                    disabledIconColor: Colors.white
                   )
                 )),
             home: child,
