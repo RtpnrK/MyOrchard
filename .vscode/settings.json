@@ -1,3 +1,8 @@
 {
-    "cmake.ignoreCMakeListsMissing": true
+    "docwriter.style": "Google",
+    "cSpell.words": [
+        "Createprofile",
+        "myorchard",
+        "สร้างโปรไฟล์"
+    ]
 }

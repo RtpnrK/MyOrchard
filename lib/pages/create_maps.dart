@@ -2,25 +2,28 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:myorchard/providers/profile_provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:myorchard/providers/map_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../pickImage.dart';
 
-class Createprofile extends StatefulWidget {
-  const Createprofile({super.key});
+class CreateMaps extends StatefulWidget {
+  const CreateMaps({super.key});
 
   @override
-  State<Createprofile> createState() => _CreateprofileState();
+  State<CreateMaps> createState() => _CreateMapsState();
 }
 
-class _CreateprofileState extends State<Createprofile> {
+class _CreateMapsState extends State<CreateMaps> {
   File? selectedImage;
   final mapNameController = TextEditingController();
   final List listPlotController = [];
 
-  Future<void> selectImage() async {
-    final image = await pickImage(); // Call the function
+  
+  Future<void> selectImageGallery() async {
+
+    final image = await pickImage(ImageSource.gallery); // Call the function
     setState(() {
       selectedImage = image; // Update the state with the picked image
     });
@@ -73,7 +76,7 @@ class _CreateprofileState extends State<Createprofile> {
                       borderRadius: BorderRadius.all(Radius.circular(22.5))),
                   child: InkWell(
                       borderRadius: BorderRadius.all(Radius.circular(22.5)),
-                      onTap: () => selectImage(),
+                      onTap: () => selectImageGallery(),
                       child: selectedImage != null
                           ? SizedBox(
                               width: 360.w,
@@ -212,7 +215,10 @@ class _CreateprofileState extends State<Createprofile> {
                                   color:
                                       Theme.of(context).colorScheme.secondary,
                                 ),
-                                Text('เพิ่มแปลง', style: Theme.of(context).textTheme.bodyLarge,)
+                                Text(
+                                  'เพิ่มแปลง',
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                )
                               ],
                             ),
                           )),
@@ -228,31 +234,30 @@ class _CreateprofileState extends State<Createprofile> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 5.h),
-        height: 60,
+        padding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 15.h),
+        height: 80.h,
         child: ElevatedButton.icon(
           onPressed: () {
-            print("add profile");
+            print("add map");
             selectedImage == null
                 ? null
-                : context.read<ProfileProvider>().addProfile(
+                : context.read<MapProvider>().addProfile(
                     selectedImage!.path,
                     mapNameController.text,
                     listPlotController
                         .map((listPlot) => listPlot.text)
                         .toList());
-
             print(
-                "จำนวน : ${context.read<ProfileProvider>().list_profiles.length}");
-            context.read<ProfileProvider>().list_profiles.forEach((element) {
-              print("ชื่อ : ${element.name}");
-              print("รูป : ${element.image}");
-              print("แปลง : ${element.profile}");
-            });
+                "จำนวน  : ${context.read<MapProvider>().list_profiles.length}");
+            // context.read<mapProvider>().list_maps.forEach((element) {
+            //   print("ชื่อ : ${element.name}");
+            //   print("รูป : ${element.image}");
+            //   print("แปลง : ${element.plots}");
+            // });
             Navigator.pop(context);
           },
-          label: Text('ยืนยัน'),
-          icon: Icon(Icons.create),
+          label: Text('ยืนยัน',style:TextStyle(color: Colors.white, fontSize: 28.sp),),
+          icon: Icon(Icons.create,size: 28.sp,),
         ),
       ),
     );
