@@ -43,6 +43,7 @@ class _EditProfileState extends State<EditProfile> {
   @override
   void initState() {
     super.initState();
+    print("Plot = ${widget.plots}");
     mapNameController = TextEditingController(text: widget.name);
     selectedImage = widget.image;
     listPlotController = widget.plots
@@ -93,7 +94,7 @@ class _EditProfileState extends State<EditProfile> {
                       onTap: () => selectImageGallerry(),
                       child: selectedImage != null
                           ? SizedBox(
-                              width: 360.w,
+                              width: 380.w,
                               height: 300.h,
                               child: Ink(
                                 decoration: BoxDecoration(
@@ -136,7 +137,7 @@ class _EditProfileState extends State<EditProfile> {
                 ),
                 Card(
                   child: SizedBox(
-                    width: 360.w,
+                    width: 380.w,
                     child: Column(
                       children: [
                         Align(
@@ -235,7 +236,8 @@ class _EditProfileState extends State<EditProfile> {
                                   ),
                                   Text(
                                     'เพิ่มแปลง',
-                                    style: Theme.of(context).textTheme.bodyLarge,
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
                                   )
                                 ],
                               ),
@@ -279,13 +281,15 @@ class _EditProfileState extends State<EditProfile> {
               height: 58.h,
               child: FilledButton(
                 onPressed: () {
-                  List<String> plotList = listPlotController.map((controller) => controller.text).toList();
+                  List<String> plotList = listPlotController
+                      .map((controller) => controller.text)
+                      .toList();
                   context.read<MapProvider>().updateProfile(MapsModel(
-                      image:selectedImage!.path ,
-                      name:mapNameController.text,
+                      image: selectedImage!.path,
+                      name: mapNameController.text,
                       id: widget.idMap,
                       plots: plotList));
-                      Navigator.pop(context);
+                  Navigator.pop(context);
                 },
                 style: ButtonStyle(
                     shape: WidgetStatePropertyAll(RoundedRectangleBorder(

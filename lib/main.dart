@@ -60,10 +60,9 @@ class MyApp extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                   bodyMedium: TextStyle(
-                    fontSize: 28.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Color.fromRGBO(115, 111, 111, 1)
-                  ),
+                      fontSize: 28.sp,
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromRGBO(115, 111, 111, 1)),
                 ),
                 fontFamily: 'Mitr',
                 cardTheme: CardTheme(

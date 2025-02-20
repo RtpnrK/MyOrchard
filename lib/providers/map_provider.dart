@@ -6,7 +6,8 @@ class MapProvider extends ChangeNotifier {
   List<MapsModel> list_profiles = []; // เก็บข้อมูลโปรไฟล์
 
   ProfileProvider() {
-    loadProfiles(); // โหลดข้อมูลเมื่อ Provider ถูกสร้าง
+    loadProfiles();
+     // โหลดข้อมูลเมื่อ Provider ถูกสร้าง
   }
 
   // โหลดข้อมูลจากฐานข้อมูล

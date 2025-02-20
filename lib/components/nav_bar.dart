@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:myorchard/calibrate.dart';
 import 'package:myorchard/pages/activities2.dart';
 import 'package:myorchard/pages/profile.dart';
+import 'package:myorchard/providers/activity_provider.dart';
+import 'package:provider/provider.dart';
 
 class NavBar extends StatefulWidget {
   final File image;
@@ -12,7 +14,11 @@ class NavBar extends StatefulWidget {
   final List? plots;
   final int idMap;
   const NavBar(
-      {super.key, required this.image, required this.name, this.plots, required this.idMap});
+      {super.key,
+      required this.image,
+      required this.name,
+      this.plots,
+      required this.idMap});
 
   @override
   State<NavBar> createState() => _NavBarState();
@@ -22,14 +28,25 @@ class _NavBarState extends State<NavBar> {
   int pageIndex = 1;
 
   @override
+  void initState() {
+    super.initState();
+    print("Plots = ${widget.plots}");
+  }
+
+  @override
   Widget build(BuildContext context) {
     final List<Widget> page = [
       Calibrate(),
-      Activities2(),
+      MultiProvider(providers: [
+        ChangeNotifierProvider(
+            create: (context) => ActivityProvider(widget.idMap)),
+      ],
+      child: Activities2(plots: widget.plots, idMap: widget.idMap)),
       Profile(
         image: widget.image,
         name: widget.name,
-        plots: widget.plots, idMap: widget.idMap,
+        plots: widget.plots,
+        idMap: widget.idMap,
       )
     ];
     return Scaffold(

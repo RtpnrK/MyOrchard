@@ -22,8 +22,7 @@ class _MapsState extends State<Maps> {
 
   @override
   void initState() {
-    ProfileDb().getProfiles();
-    context.read<MapProvider>().refreshProfiles();
+    context.read<MapProvider>().loadProfiles();
     super.initState();
   }
 

@@ -56,6 +56,12 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "dropdown_button2",
+      "rootUri": "file:///C:/Users/nahee/AppData/Local/Pub/Cache/hosted/pub.dev/dropdown_button2-2.3.9",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
       "name": "fake_async",
       "rootUri": "file:///C:/Users/nahee/AppData/Local/Pub/Cache/hosted/pub.dev/fake_async-1.3.1",
       "packageUri": "lib/",
@@ -500,7 +506,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-02-14T11:11:12.923811Z",
+  "generated": "2025-02-19T07:37:29.005798Z",
   "generator": "pub",
   "generatorVersion": "3.6.1",
   "flutterRoot": "file:///C:/Users/nahee/Downloads/flutter_windows_3.27.2-stable/flutter",

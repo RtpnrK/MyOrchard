@@ -47,7 +47,8 @@ class ProfileDb {
 
   Future<List<MapsModel>> getProfiles() async {
     Database db = await database;
-    List<Map<String, dynamic>> maps = await db.query('testProfile');
+    List<Map<String, dynamic>> maps = await db.query('testProfile',
+        orderBy: 'id DESC');
     list_profiles = maps.map((map) => MapsModel.fromMap(map)).toList();
     // print("${list_profiles[0].plots}");
     return list_profiles;

@@ -77,7 +77,7 @@ class _ProfileState extends State<Profile> {
               Card(
                 child: Container(
                   height: 300.h,
-                  width: 360.w,
+                  width: 380.w,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(22.5)),
                       image: DecorationImage(
@@ -87,7 +87,7 @@ class _ProfileState extends State<Profile> {
               Spacer(),
               Card(
                   child: Container(
-                width: 360.w,
+                width: 380.w,
                 height: 365.h,
                 decoration: BoxDecoration(
                   color: Colors.white,
