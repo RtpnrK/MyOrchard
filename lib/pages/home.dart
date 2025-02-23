@@ -5,18 +5,19 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:myorchard/components/nav_bar.dart';
 import 'package:myorchard/database/maps_db.dart';
+import 'package:myorchard/pages/mainPage.dart';
 import 'package:myorchard/pages/create_maps.dart';
 import 'package:myorchard/providers/map_provider.dart';
 import 'package:provider/provider.dart';
 
-class Maps extends StatefulWidget {
-  const Maps({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
 
   @override
-  State<Maps> createState() => _MapsState();
+  State<Home> createState() => _HomeState();
 }
 
-class _MapsState extends State<Maps> {
+class _HomeState extends State<Home> {
   int indexes = 0;
   final CarouselSliderController _sliderController = CarouselSliderController();
 
@@ -70,7 +71,7 @@ class _MapsState extends State<Maps> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => NavBar(
+                                      builder: (context) => MainPage(
                                             image: File(
                                               context
                                                   .watch<MapProvider>()
@@ -91,12 +92,6 @@ class _MapsState extends State<Maps> {
                                                     .id ??
                                                 0,
                                           )
-                                      // Activities(
-                                      //       image: File(context
-                                      //           .watch<MapProvider>()
-                                      //           .list_profiles[index]
-                                      //           .image),
-                                      //     )
                                       ));
                             },
                             child: Column(

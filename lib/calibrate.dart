@@ -1,81 +1,559 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ml_linalg/linalg.dart';
-import 'package:myorchard/models/pinModel.dart';
 import 'package:myorchard/optimize.dart';
-import 'package:myorchard/pin.dart';
-import 'package:myorchard/pinDetails.dart';
-import 'package:myorchard/pinsDB.dart';
 
 class Calibrate extends StatefulWidget {
-  final File? image;
-  const Calibrate({super.key, this.image});
+  final File image;
+  final double? scale;
+  const Calibrate({super.key, required this.image, this.scale});
+
   @override
-  CalibrateState createState() => CalibrateState();
+  State<Calibrate> createState() => _CalibrateState();
 }
 
-class CalibrateState extends State<Calibrate> {
-  Offset imgOffset = const Offset(0, 0);
-  Offset currentOffset = const Offset(0, 0);
-  Pin? oldPin;
-  String message = "Please add pin at least 3 points to start calibrate.";
-  bool isPress = false;
+class _CalibrateState extends State<Calibrate> {
+  TransformationController viewTranformationController =
+      TransformationController();
+  double pinSize = 30;
+  double totalDistance = 0;
+  bool advanceMode = false;
   bool isPin = false;
-  bool isUpdate = false;
-  double lat = 0;
-  double long = 0;
-  double pinSize = 50;
   Color pinColor = Colors.transparent;
   Color pickerColor = Colors.transparent;
+  List<Pin> pinList = [];
   int index = 0;
-  int pinCount = 0;
-  var currentPin = <int, Pin>{};
-  var pinDetail = <int, PinDetails>{};
-  late Position currentPosition;
-  late double newPinSize;
+  String message = '';
+  Offset myPosition = Offset.zero;
+  late double lat;
+  late double long;
   Optimize? opt;
-  late List pins = [];
+  late Position position;
   StreamSubscription<Position>? positionStreamSubscription;
 
   @override
   void initState() {
-    DatabaseHelper().getPins();
-    loadData();
-    DatabaseHelper().fetchPins();
+    viewTranformationController.value = Matrix4.identity() * widget.scale;
+    _checkPermission();
     super.initState();
   }
 
-  Future<void> loadData() async {
-    List<PinM> pins = await DatabaseHelper().getPins();
-    print("Data Loaded!");
-    setState(() {
-       for (var pin in pins) {
-        pinDetail[pin.id!] = PinDetails(
-        pinColor: colorFromHex(pin.color)!,
-        pinOffset: Offset(pin.offsetX, pin.offsetY),
-        lat: pin.latitude,
-        long: pin.longitude,
-        remove: () {
-          setState(() {
-            currentPin.remove(pin.id);
-            pinDetail.remove(pin.id);
-            pinCount--;
-          });
-        });
-        currentPin[pin.id!] = Pin(
-          imgOffset: Offset(pin.offsetX, pin.offsetY),
-          pinColor: colorFromHex(pin.color)!,
-          pinSize: pinSize);
-    }
-    });
-  
+  @override
+  void dispose() {
+    positionStreamSubscription?.cancel();
+    super.dispose();
   }
 
-  Future<void> _getCurrentLocation() async {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: Padding(
+          padding: EdgeInsets.only(top: 12.h, left: 10.w),
+          child: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              size: 40.h,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+        backgroundColor: Colors.white,
+        title: Text(
+          'ปรับเทียบ',
+          style: Theme.of(context).textTheme.headlineLarge,
+        ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(top: 10.h),
+            child: TextButton.icon(
+              onPressed: () {},
+              label: Text('บันทึก'),
+              icon: Icon(
+                Icons.save,
+                size: 30.sp,
+              ),
+              iconAlignment: IconAlignment.end,
+            ),
+          )
+        ],
+        toolbarHeight: 100.h,
+      ),
+      bottomNavigationBar: Container(
+        height: 80.h,
+        width: double.infinity,
+        color: Colors.white,
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          IconButton.filled(
+              style: IconButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary),
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        actionsAlignment: MainAxisAlignment.spaceAround,
+                        title: const Text("Select Pin Color"),
+                        content: BlockPicker(
+                            pickerColor: pickerColor,
+                            onColorChanged: (color) {
+                              setState(() {
+                                pickerColor = color;
+                              });
+                            }),
+                        actions: [
+                          ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("ยกเลิก")),
+                          ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  pinColor = pickerColor;
+                                  isPin = true;
+                                });
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("ตกลง"))
+                        ],
+                      );
+                    });
+              },
+              icon: Row(
+                children: [
+                  Icon(
+                    Icons.add,
+                    size: 20.sp,
+                  ),
+                  Icon(
+                    Icons.location_pin,
+                    size: 30.sp,
+                  )
+                ],
+              )),
+          SizedBox(
+            height: 50.h,
+            width: 150.w,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary),
+              onPressed: pinList.length >= 3
+                  ? () {
+                      double errAvg = 0;
+                      pinList.forEach((Pin p) {
+                        errAvg += p.position.accuracy;
+                      });
+                      errAvg /= pinList.length;    
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: Text('Calibrate',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium),
+                                contentPadding: EdgeInsets.all(20.sp),
+                                content: SizedBox(
+                                  width: double.maxFinite,
+                                  height: 150,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(
+                                        'จำนวน pin: ${pinList.length}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayMedium,
+                                      ),
+                                      Text(
+                                        'ระยะทางทั้งหมด: ${totalDistance.toStringAsFixed(2)} เมตร',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayMedium,
+                                      ),
+                                      Text(
+                                        'Error เฉลี่ย: ${errAvg.toStringAsFixed(2)} เมตร',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayMedium,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                actionsAlignment: MainAxisAlignment.center,
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      await _calibrate();
+                                      _startLocationUpdates();
+                                      setState(() {
+                                        Navigator.of(context).pop();
+                                      });
+                                    },
+                                    child: Text('Start Calibrate'),
+                                  ),
+                                ],
+                              ));
+                    }
+                  : () {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                        'กรุณาปักหมุดอย่างน้อย 3 ตำแหน่ง',
+                        style: TextStyle(fontSize: 20.sp),
+                      )));
+                    },
+              label: Text('Calibrate', style: TextStyle(
+                fontSize: 16.sp
+              ),),
+              icon: ImageIcon(
+                AssetImage('assets/icons/calibrate.png'),
+                size: 25.sp,
+              ),
+            ),
+          ),
+          IconButton.filled(
+              style: IconButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary),
+              onPressed: () {
+                if (isPin) {
+                  pinCancel();
+                }
+                showModalBottomSheet(
+                    showDragHandle: true,
+                    context: context,
+                    backgroundColor: Colors.white,
+                    isScrollControlled: true,
+                    useSafeArea: true,
+                    builder: (context) => StatefulBuilder(
+                            builder: (context, setBottomSheetState) {
+                          return DraggableScrollableSheet(
+                              expand: false,
+                              builder: (context, scrollController) =>
+                                  SingleChildScrollView(
+                                    controller: scrollController,
+                                    child: Container(
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(30.w),
+                                              topRight: Radius.circular(30.w))),
+                                      child: Column(
+                                        children: List.generate(
+                                            pinList.length,
+                                            (idx) => Column(
+                                                  children: [
+                                                    ListTile(
+                                                      trailing: IconButton(
+                                                          onPressed: () {
+                                                            setBottomSheetState(
+                                                                () {
+                                                              setState(() {
+                                                                pinList
+                                                                    .removeAt(
+                                                                        idx);
+                                                                index--;
+                                                              });
+                                                            });
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.delete,
+                                                            size: 40.sp,
+                                                          )),
+                                                      leading: Icon(
+                                                        Icons.location_pin,
+                                                        color: pinList[idx]
+                                                            .pinColor,
+                                                        size: 40.sp,
+                                                      ),
+                                                      title: Text(
+                                                          'Pin No.${idx + 1}',
+                                                          style: Theme.of(context).textTheme.bodyMedium,),
+                                                      subtitle: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                              'Pixel Offset: ${pinList[idx].pinOffset.toString()}',
+                                                              style: Theme.of(context).textTheme.bodySmall,),
+                                                          Text(
+                                                              'Latitude: ${pinList[idx].position.latitude}',
+                                                              style: Theme.of(context).textTheme.bodySmall),
+                                                          Text(
+                                                              'Longtitude: ${pinList[idx].position.longitude}',
+                                                              style: Theme.of(context).textTheme.bodySmall),
+                                                          Text(
+                                                            'Error: ${pinList[idx].position.accuracy.toStringAsFixed(2)} เมตร',
+                                                            style: Theme.of(context).textTheme.bodySmall,
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Divider(
+                                                      thickness: 2,
+                                                      indent: 20.w,
+                                                      endIndent: 20.w,
+                                                    )
+                                                  ],
+                                                )),
+                                      ),
+                                    ),
+                                  ));
+                        }));
+              },
+              icon: Icon(
+                Icons.list,
+                size: 30.sp,
+              )),
+          IconButton.filled(
+              style: IconButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary),
+              onPressed: () {
+                double size = pinSize;
+                bool mode = advanceMode;
+                showDialog(
+                    context: context,
+                    builder: (context) =>
+                        StatefulBuilder(builder: (context, setDialogState) {
+                          return AlertDialog(
+                            title: Text(
+                              'ตั้งค่า',
+                              textAlign: TextAlign.center,
+                            ),
+                            content: SizedBox(
+                              height: 200.h,
+                              width: double.maxFinite,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Text('ขนาด Pin'),
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                              onPressed: () {
+                                                setDialogState(() {
+                                                  size -= 5;
+                                                });
+                                              },
+                                              icon: Icon(Icons.remove)),
+                                          Text('$size'),
+                                          IconButton(
+                                              onPressed: () {
+                                                setDialogState(() {
+                                                  size += 5;
+                                                });
+                                              },
+                                              icon: Icon(Icons.add)),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Text('ขั้นสูง (ใช้เวลานานขึ้น)'),
+                                      Switch(
+                                          value: mode,
+                                          onChanged: (value) {
+                                            setDialogState(() {
+                                              mode = value;
+                                            });
+                                          })
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            actionsAlignment: MainAxisAlignment.spaceAround,
+                            actions: [
+                              ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('ยกเลิก')),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      pinSize = size;
+                                      advanceMode = mode;
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('ตกลง'))
+                            ],
+                          );
+                        }));
+              },
+              icon: Icon(
+                Icons.settings,
+                size: 30.sp,
+              )),
+        ]),
+      ),
+      body: Center(
+          child: Stack(
+        children: [
+          InteractiveViewer(
+              minScale: 0.2,
+              transformationController: viewTranformationController,
+              constrained: false,
+              child: GestureDetector(
+                  onTapDown: isPin
+                      ? (details) {
+                          setState(() {
+                            print(details.localPosition);
+                            Offset pinPosition = details.localPosition;
+                            if (pinList.length == index) {
+                              // Don't have any value at pinList[index].
+                              pinList.add(Pin(pinPosition, pinColor));
+                            } else {
+                              pinList[index].pinOffset =
+                                  pinPosition; // Edit value in pinList[index].
+                            }
+                            print(pinList.length);
+                            print(index);
+                          });
+                        }
+                      : null,
+                  child: Stack(
+                    children: [
+                      Image(image: FileImage(widget.image)),
+                      ...List.generate(
+                          pinList.length,
+                          (idx) => Positioned(
+                              top: (pinList[idx].pinOffset.dy) - pinSize,
+                              left: (pinList[idx].pinOffset.dx) - (pinSize / 2),
+                              child: Icon(
+                                Icons.location_pin,
+                                color: pinList[idx].pinColor,
+                                size: pinSize,
+                              ))),
+                      Positioned(
+                          left: myPosition.dx - (pinSize / 2),
+                          top: myPosition.dy - pinSize,
+                          child: Icon(
+                            Icons.man,
+                            size: pinSize,
+                          ))
+                    ],
+                  ))),
+          Visibility(
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            visible: isPin,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: EdgeInsets.only(top: 20.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => pinCancel(),
+                      label: Text('ยกเลิก'),
+                      icon: Icon(
+                        Icons.close,
+                        size: 30.sp,
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: pinList.length != index
+                          ? () async {
+                              await _loadingState();
+                              pinList[index].addPosition(position);
+                              setState(() {
+                                updateDistance();
+                                index++;
+                                isPin = false;
+                              });
+                            }
+                          : null,
+                      label: Text('ตกลง'),
+                      icon: Icon(
+                        Icons.check,
+                        size: 30.sp,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          )
+        ],
+      )),
+      floatingActionButton: IconButton.filled(
+          color: Theme.of(context).colorScheme.primary,
+          style: IconButton.styleFrom(backgroundColor: Colors.white),
+          onPressed: opt != null
+              ? () {
+                  updateGPS();
+                }
+              : () {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                      'กรุณาทำการปรับเทียบค่า (Calibrate) ก่อน',
+                      style: TextStyle(fontSize: 18.sp),
+                    ),
+                  ));
+                },
+          icon: Icon(
+            Icons.gps_fixed,
+            size: 40.sp,
+          )),
+    );
+  }
+
+  void pinCancel() {
+    setState(() {
+      if (pinList.length != index) {
+        // Value has changed
+        pinList.removeAt(index);
+      }
+      isPin = false;
+    });
+  }
+
+  Future<void> _calibrate() async {
+    List<List<double>> l1 = [[], []];
+    List<List<double>> l2 = [[], []];
+    pinList.forEach((Pin p) {
+      l1[0].add(p.position.latitude);
+      l1[1].add(p.position.longitude);
+      l2[0].add(p.pinOffset.dx);
+      l2[1].add(p.pinOffset.dy);
+    });
+    var GP = Matrix.fromList(l1, dtype: DType.float64);
+    var SP = Matrix.fromList(l2, dtype: DType.float64);
+    opt = Optimize(GP, SP);
+    opt!.solve();
+    await _loadingState();
+    var current_gp = Matrix.fromList([
+      [lat],
+      [long]
+    ], dtype: DType.float64);
+    var current_sp = opt!.toSP(current_gp);
+    myPosition = Offset(current_sp[0][0], current_sp[1][0]);
+    log('Screen Position = \n ${current_sp.toString()}');
+    log('Global Position = \n ${current_gp.toString()}');
+  }
+
+  Future<void> _checkPermission() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -105,14 +583,17 @@ class CalibrateState extends State<Calibrate> {
       });
       return;
     }
+  }
 
-    currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-        
-    setState(() {
-      lat = currentPosition.latitude;
-      long = currentPosition.longitude;
-    });
+  Future<void> _getCurrentLocation() async {
+      Position currentPosition = await Geolocator.getCurrentPosition(
+          locationSettings: AndroidSettings(accuracy: LocationAccuracy.best));
+
+      setState(() {
+        position = currentPosition;
+        lat = currentPosition.latitude;
+        long = currentPosition.longitude;
+      });
   }
 
   Future<void> _loadingState() async {
@@ -123,321 +604,12 @@ class CalibrateState extends State<Calibrate> {
           return const Center(child: CircularProgressIndicator());
         });
     await _getCurrentLocation();
+    while (position.accuracy > 15) {
+      await _getCurrentLocation();
+    }
     if (mounted) {
       Navigator.of(context).pop();
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        shape: const CircleBorder(),
-        onPressed: opt == null? (){
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Please calibrate before get current location'),
-            duration: Duration(seconds: 3),
-            backgroundColor: Colors.grey,)
-          );
-        }: (){
-          _startLocationUpdates();
-        },
-        child: const Icon(Icons.gps_fixed),
-      ),
-      appBar: AppBar(),
-      endDrawer: Drawer(
-        child: SafeArea(
-            child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const Text(
-                "Pin Details",
-                style: TextStyle(fontSize: 20),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              ...pinDetail.values,
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: pinDetail.length >= 3
-                    ? () async {
-                        List<List<double>> l1 = [[], []];
-                        List<List<double>> l2 = [[], []];
-                        DatabaseHelper().deleteAllPins();
-                        pinDetail.forEach((i, e) {
-                          l1[0].add(e.lat);
-                          l1[1].add(e.long);
-                          l2[0].add(e.pinOffset.dx);
-                          l2[1].add(e.pinOffset.dy);
-                          DatabaseHelper().insertPin(PinM(
-                              latitude: e.lat,
-                              longitude: e.long,
-                              offsetX: e.pinOffset.dx,
-                              offsetY: e.pinOffset.dy,
-                              color: e.pinColor.value.toRadixString(16)));
-                        });
-                        var GP = Matrix.fromList(l1, dtype: DType.float64);
-                        var SP = Matrix.fromList(l2, dtype: DType.float64);
-                        opt = Optimize(GP, SP);
-                        opt!.solve();
-                        await _loadingState();
-                        var current_gp = Matrix.fromList([
-                          [lat],
-                          [long]
-                        ], dtype: DType.float64);
-                        var current_sp = opt!.toSP(current_gp);
-                        currentOffset =
-                            Offset(current_sp[0][0], current_sp[1][0]);
-                        log(current_sp.toString());
-                        log(current_gp.toString());
-
-                        print("Pins");
-                        DatabaseHelper().fetchPins();
-                      }
-                    : null,
-                label: const Text('Calibrate'),
-                icon: const Icon(Icons.compass_calibration),
-              )
-            ],
-          ),
-        )),
-      ),
-      body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            margin: const EdgeInsets.all(10),
-            width: 400,
-            height: 350,
-            decoration: const BoxDecoration(
-              boxShadow: [
-                BoxShadow(color: Color.fromRGBO(64, 64, 64, 1), blurRadius: 10)
-              ],
-            ),
-            child: InteractiveViewer(
-              minScale: 0.1,
-              maxScale: 2.0,
-              constrained: false,
-              child: GestureDetector(
-                onTapDown: (details) {
-                  setState(() {
-                    if (isPress) {
-                      imgOffset = details.localPosition;
-                      isPin = true;
-                      if (!currentPin.containsKey(index)) {
-                        oldPin = null;
-                      }
-                      currentPin[index] = Pin(
-                        imgOffset: imgOffset,
-                        pinColor: pinColor,
-                        pinSize: pinSize,
-                      );
-                    }
-                  });
-                },
-                child: Stack(
-                  children: [
-                    widget.image != null
-                        ? Center(
-                            child: Image.file(
-                              widget.image!,
-                            ),
-                          )
-                        : Image.asset("assets/images/map_MyOrchard.jpg",
-                            fit: BoxFit.contain),
-                    ...currentPin.values,
-                    Positioned(
-                      left: currentOffset.dx - (pinSize / 2),
-                      top: currentOffset.dy - pinSize,
-                      child: Icon(Icons.man, size: pinSize),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Visibility(
-                  visible: isPress,
-                  maintainSize: true,
-                  maintainAnimation: true,
-                  maintainState: true,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          currentPin.remove(index);
-                          isPress = false;
-                          isPin = false;
-                          message = "";
-                        });
-                      },
-                      child: const Text("Cancel"))),
-              Visibility(
-                  visible: isPress,
-                  maintainSize: true,
-                  maintainAnimation: true,
-                  maintainState: true,
-                  child: ElevatedButton(
-                      onPressed: isPin
-                          ? () async {
-                              setState(() {
-                                isPress = false;
-                              });
-                              await _loadingState();
-                              updateDrawer();
-                              pinCount++;
-                              message = "Your location is saved at $imgOffset.";
-                            }
-                          : null,
-                      child: const Text("Apply"))),
-            ],
-          ),
-          const SizedBox(height: 30),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton.icon(
-                  onPressed: pinCount < 5
-                      ? () {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text("Select Pin Color"),
-                                  content: BlockPicker(
-                                      pickerColor: pickerColor,
-                                      onColorChanged: colorChange),
-                                  actions: [
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text("Cancel")),
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            pinColor = pickerColor;
-                                          });
-                                          message =
-                                              "Mark your location on a map.";
-                                          index = pinCount;
-                                          isPress = true;
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text("OK"))
-                                  ],
-                                );
-                              });
-                        }
-                      : null,
-                  label: const Text("Add Pin"),
-                  icon: const Icon(
-                    Icons.location_pin,
-                    size: 30,
-                  )),
-              const SizedBox(
-                width: 20,
-              ),
-              IconButton(
-                onPressed: () {
-                  newPinSize = pinSize;
-                  showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) {
-                        return StatefulBuilder(builder: (context, setState) {
-                          return AlertDialog(
-                            title: const Text('Pin Settings'),
-                            content: Row(
-                              children: [
-                                const Text(
-                                  'Pin Size',
-                                  style: TextStyle(fontSize: 20),
-                                ),
-                                const SizedBox(
-                                  width: 50,
-                                ),
-                                IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        newPinSize -= 5;
-                                      });
-                                    },
-                                    icon: const Icon(Icons.remove_circle)),
-                                Text('$newPinSize'),
-                                IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        newPinSize += 5;
-                                      });
-                                    },
-                                    icon: const Icon(Icons.add_circle)),
-                              ],
-                            ),
-                            actions: [
-                              OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context, 'Cancel');
-                                  },
-                                  child: const Text('Cancel')),
-                              OutlinedButton(
-                                  onPressed: () {
-                                    pinSize = newPinSize;
-                                    updatePinSize(newPinSize);
-                                    Navigator.pop(context, 'Apply');
-                                  },
-                                  child: const Text('Apply'))
-                            ],
-                          );
-                        });
-                      });
-                },
-                icon: const Icon(Icons.settings),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 30,
-          ),
-          Text(message),
-        ],
-      )),
-    );
-  }
-
-  void updateDrawer() {
-    int thisPin = index;
-    pinDetail[index] = PinDetails(
-        pinColor: pinColor,
-        pinOffset: imgOffset,
-        lat: currentPosition.latitude,
-        long: currentPosition.longitude,
-        remove: () {
-          setState(() {
-            currentPin.remove(thisPin);
-            pinDetail.remove(thisPin);
-            pinCount--;
-          });
-        });
-  }
-
-  void updatePinSize(double size) {
-    setState(() {
-      pinSize = size;
-      currentPin.forEach((key, value) => currentPin[key] = Pin(
-          imgOffset: value.imgOffset, pinColor: value.pinColor, pinSize: size));
-    });
-  }
-
-  void colorChange(Color color) {
-    setState(() {
-      pickerColor = color;
-    });
   }
 
   Future<void> updateGPS() async {
@@ -450,19 +622,46 @@ class CalibrateState extends State<Calibrate> {
     log(current_sp.toString());
     log(current_gp.toString());
     setState(() {
-      currentOffset = Offset(current_sp[0][0], current_sp[1][0]);
+      myPosition = Offset(current_sp[0][0], current_sp[1][0]);
     });
   }
 
   void _startLocationUpdates() {
     const LocationSettings locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high, 
-      distanceFilter: 1, 
+      accuracy: LocationAccuracy.high,
     );
 
-    positionStreamSubscription = Geolocator.getPositionStream(locationSettings: locationSettings)
-        .listen((Position position) {
+    positionStreamSubscription =
+        Geolocator.getPositionStream(locationSettings: locationSettings)
+            .listen((Position position) {
       updateGPS();
     });
+  }
+
+  void updateDistance() {
+    if (pinList.length > 1) {
+      int end = pinList.length - 1;
+      int start = pinList.length - 2;
+      double d = Geolocator.distanceBetween(
+          pinList[start].position.latitude,
+          pinList[start].position.longitude,
+          pinList[end].position.latitude,
+          pinList[end].position.longitude);
+      totalDistance += d;
+    } else {
+        return;
+    }
+  }
+}
+
+class Pin {
+  Offset pinOffset;
+  Color pinColor;
+  late Position position;
+  bool visible = true;
+  Pin(this.pinOffset, this.pinColor);
+
+  void addPosition(Position p) {
+    position = p;
   }
 }

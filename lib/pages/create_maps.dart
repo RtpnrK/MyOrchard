@@ -142,6 +142,7 @@ class _CreateMapsState extends State<CreateMaps> {
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
+                              hintStyle: Theme.of(context).textTheme.bodyMedium,
                               hintText: 'กรอกชื่อโปรไฟล์',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
@@ -217,7 +218,7 @@ class _CreateMapsState extends State<CreateMaps> {
                                 ),
                                 Text(
                                   'เพิ่มแปลง',
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                  style: Theme.of(context).textTheme.bodyMedium,
                                 )
                               ],
                             ),
@@ -256,7 +257,7 @@ class _CreateMapsState extends State<CreateMaps> {
             // });
             Navigator.pop(context);
           },
-          label: Text('ยืนยัน',style:TextStyle(color: Colors.white, fontSize: 28.sp),),
+          label: Text('ยืนยัน',style:TextStyle(color: Colors.white, fontSize: 22.sp),),
           icon: Icon(Icons.create,size: 28.sp,),
         ),
       ),

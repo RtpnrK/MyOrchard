@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:myorchard/calibrate.dart';
-import 'package:myorchard/pages/activities2.dart';
+import 'package:myorchard/calibrate_old.dart';
+import 'package:myorchard/pages/activities.dart';
 import 'package:myorchard/pages/profile.dart';
 
 class NavBar extends StatefulWidget {
@@ -24,13 +24,6 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> page = [
-      Calibrate(),
-      Activities2(),
-      Profile(
-        image: widget.image,
-        name: widget.name,
-        plots: widget.plots, idMap: widget.idMap,
-      )
     ];
     return Scaffold(
       bottomNavigationBar: Stack(

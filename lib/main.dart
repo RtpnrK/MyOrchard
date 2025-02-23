@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:myorchard/pages/maps.dart';
+import 'package:myorchard/pages/home.dart';
 import 'package:myorchard/providers/map_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -55,22 +55,26 @@ class MyApp extends StatelessWidget {
                       fontSize: 30.sp,
                       fontWeight: FontWeight.w600,
                       color: const Color.fromRGBO(98, 114, 84, 1)),
+                  headlineSmall: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w600,
+                      color: const Color.fromRGBO(98, 114, 84, 1)),
+                  displaySmall: TextStyle(
+                      fontSize: 16.sp,
+                      color: const Color.fromRGBO(98, 114, 84, 1)),
                   displayMedium: TextStyle(
                       fontSize: 20.sp,
                       color: const Color.fromRGBO(98, 114, 84, 1)),
                   bodySmall: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.w400,
-                      color: Color.fromRGBO(115, 111, 111, 1)),
-                  bodyLarge: TextStyle(
-                    fontSize: 28.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
+                      fontSize: 12.sp,
+                      color: Colors.black),
                   bodyMedium: TextStyle(
-                    fontSize: 28.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Color.fromRGBO(115, 111, 111, 1)
-                  ),
+                      fontSize: 15.sp,
+                      color: Colors.black),
+                  bodyLarge: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black),
                 ),
                 fontFamily: 'Mitr',
                 cardTheme: const CardTheme(
@@ -92,7 +96,7 @@ class MyApp extends StatelessWidget {
             home: child,
           );
         },
-        child: const Maps(),
+        child: const Home(),
       ),
     );
   }

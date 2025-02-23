@@ -24,52 +24,7 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: Padding(
-          padding: EdgeInsets.only(top: 12.h, left: 10.w),
-          child: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              size: 40.h,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        backgroundColor: Colors.white,
-        title: Text(
-          "โปรไฟล์",
-          style: Theme.of(context).textTheme.headlineLarge,
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(top: 12.h, right: 18.w),
-            child: IconButton(
-              icon: Icon(
-                CustomIcons.edit,
-                size: 38.sp,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              onPressed: () {
-                print("ID : ${widget.idMap}");
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return EditProfile(
-                    image: widget.image,
-                    name: widget.name,
-                    plots: widget.plots,
-                    idMap: widget.idMap,
-                  );
-                }));
-              },
-            ),
-          ),
-        ],
-        toolbarHeight: 100.h,
-      ),
-      body: Padding(
+    return Padding(
         padding: EdgeInsets.only(top: 10.h),
         child: Center(
           child: Column(
@@ -140,7 +95,6 @@ class _ProfileState extends State<Profile> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
