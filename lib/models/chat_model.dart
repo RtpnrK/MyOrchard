@@ -4,11 +4,11 @@ class ChatModel {
   final int? id;
 
   ChatModel(
-    this.message,
-    this.time,
-    this.date,
-    this.profileId,
-    this.id,
+    {this.id,
+    required this.message,
+    required this.time,
+    required this.date,
+    required this.profileId,}
   );
 
   Map<String, dynamic> toMap() {
@@ -23,6 +23,10 @@ class ChatModel {
 
   factory ChatModel.fromMap(Map<String, dynamic> map) {
     return ChatModel(
-        map['time'], map['profileId'], map['message'], map['date'], map['id']);
+        message: map['message'],
+        time: map['time'],
+        profileId: map['profileId'],
+        date: map['date'],
+        id: map['id']);
   }
 }
