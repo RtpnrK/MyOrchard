@@ -15,11 +15,11 @@ class ActivityProvider extends ChangeNotifier {
     listActivities =
         await ActivitiesDb().getActivities(profileId); // ดึงข้อมูลจากฐานข้อมูล
     notifyListeners(); // แจ้งเตือนให้ UI อัปเดต
-    print("loadActivities = ${listActivities.length}");
+    print("loadedActivities");
   }
 
   // รีเฟรชข้อมูล
-  Future<void> refreshProfiles(int profileId) async {
+  Future<void> refreshActivities(int profileId) async {
     await loadActivities(profileId); // ใช้ loadProfiles() เพื่อดึงข้อมูลใหม่
     print("reloaded Activity");
   }
@@ -63,6 +63,7 @@ class ActivityProvider extends ChangeNotifier {
     try {
       await ActivitiesDb().updateActivities(activity); // ลบออกจากฐานข้อมูล
       await loadActivities(activity.profileId);
+      notifyListeners();
       print("${activity.tree}"); // โหลดข้อมูลใหม่เพื่ออัปเดต UI
       print("แก้ไขกิจกรรมสำเร็จ");
     } catch (e) {

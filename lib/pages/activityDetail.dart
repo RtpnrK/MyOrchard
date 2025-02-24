@@ -3,12 +3,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:myorchard/models/activities_model.dart';
+import 'package:myorchard/pages/edit_activity.dart';
 import 'package:myorchard/providers/activity_provider.dart';
 import 'package:provider/provider.dart';
 
 class ActivityDetail extends StatefulWidget {
   final ActivitiesModel activity;
-  const ActivityDetail({super.key, required this.activity});
+  final List? plots;
+  const ActivityDetail({
+    super.key,
+    required this.activity,
+    this.plots,
+  });
 
   @override
   State<ActivityDetail> createState() => _ActivityDetailState();
@@ -16,18 +22,29 @@ class ActivityDetail extends StatefulWidget {
 
 class _ActivityDetailState extends State<ActivityDetail> {
   late double width, height;
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
+
+    final activityProvider = context.watch<ActivityProvider>();
+    final updatedActivity = activityProvider.listActivities.firstWhere(
+      (a) => a.id == widget.activity.id,
+      orElse: () => widget.activity,
+    );
+
     return Scaffold(
       body: Stack(
         children: [
           SizedBox(
             width: width,
             height: height * 0.36,
-            child: Image.file(
+            child: widget.activity.image != null ? Image.file(
               File(widget.activity.image!),
+              fit: BoxFit.cover,
+            ) : Image.asset(
+              'assets/images/noimage.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -61,14 +78,14 @@ class _ActivityDetailState extends State<ActivityDetail> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${widget.activity.tree}',
+                              '${updatedActivity.tree}',
                               style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 40.sp),
                             ),
                             Text(
-                              '${widget.activity.date}',
+                              '${updatedActivity.date}',
                               style: TextStyle(
                                   color: Color.fromRGBO(66, 65, 65, 1),
                                   fontWeight: FontWeight.w600,
@@ -80,15 +97,11 @@ class _ActivityDetailState extends State<ActivityDetail> {
                           width: width,
                           child: Row(
                             children: [
-                              Text('แปลง : ',
+                              Text('แปลง : ${updatedActivity.plot}',
                                   style: TextStyle(
                                       fontSize: 30.sp,
                                       color: Colors.black,
                                       fontWeight: FontWeight.w400)),
-                              Text(
-                                widget.activity.plot ?? '',
-                                style: TextStyle(fontSize: 30.sp),
-                              ),
                             ],
                           ),
                         ),
@@ -96,14 +109,13 @@ class _ActivityDetailState extends State<ActivityDetail> {
                           width: width,
                           child: Row(
                             children: [
-                              Text('กิจกรรม : ',
-                                  style: TextStyle(
-                                      fontSize: 30.sp,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400)),
-                              Text(
-                                widget.activity.activity ?? '',
-                                style: TextStyle(fontSize: 30.sp),
+                              Expanded(
+                                child: Text(
+                                    'กิจกรรม : ${updatedActivity.activity} ',
+                                    style: TextStyle(
+                                        fontSize: 30.sp,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w400)),
                               ),
                             ],
                           ),
@@ -111,15 +123,15 @@ class _ActivityDetailState extends State<ActivityDetail> {
                         SizedBox(
                           width: width,
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('รายละเอียด : ',
-                                  style: TextStyle(
-                                      fontSize: 30.sp,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400)),
-                              Text(
-                                widget.activity.details ?? '',
-                                style: TextStyle(fontSize: 30.sp),
+                              Expanded(
+                                child: Text(
+                                    'รายละเอียด : ${updatedActivity.details} ',
+                                    style: TextStyle(
+                                        fontSize: 30.sp,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w400)),
                               ),
                             ],
                           ),
@@ -136,12 +148,41 @@ class _ActivityDetailState extends State<ActivityDetail> {
                             height: 70.h,
                             child: FilledButton(
                               onPressed: () {
-                                context
-                                    .read<ActivityProvider>()
-                                    .removeActivity(widget.activity)
-                                    .then((_) {
-                                  Navigator.pop(context, true);
-                                });
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext) {
+                                      return AlertDialog(
+                                        title: Text(
+                                          'ยืนยันการลบกิจกรรม',
+                                          style: TextStyle(
+                                              color: Colors.redAccent,
+                                              fontSize: 30.sp),
+                                        ),
+                                        content: Text(
+                                          'คุณต้องการลบกิจกรรมนี้ใช่หรือไม่?',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall,
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('ยกเลิก')),
+                                          TextButton(
+                                              onPressed: () {
+                                                context
+                                                    .read<ActivityProvider>()
+                                                    .removeActivity(
+                                                        updatedActivity);
+                                                Navigator.pop(context);
+                                                Navigator.pop(context, true);
+                                              },
+                                              child: Text('ยืนยัน'))
+                                        ],
+                                      );
+                                    });
                               },
                               style: ButtonStyle(
                                   shape: WidgetStatePropertyAll(
@@ -160,7 +201,15 @@ class _ActivityDetailState extends State<ActivityDetail> {
                             width: 185.w,
                             height: 70.h,
                             child: FilledButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => EditActivity(
+                                              activity: updatedActivity,
+                                              plots: widget.plots,
+                                            )));
+                              },
                               style: ButtonStyle(
                                   shape: WidgetStatePropertyAll(
                                       RoundedRectangleBorder(

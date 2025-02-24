@@ -106,32 +106,17 @@ class _EditProfileState extends State<EditProfile> {
                                         fit: BoxFit.cover)),
                               ),
                             )
-                          : Container(
+                          : SizedBox(
+                              width: 380.w,
                               height: 300.h,
-                              width: 360.w,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black26),
-                                borderRadius: BorderRadius.circular(22.5),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.file_upload_sharp,
-                                    size: 50.h,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  Text('เลือกรูปภาพ',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelLarge
-                                          ?.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                          )),
-                                ],
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(22.5)),
+                                    image: DecorationImage(
+                                        image: FileImage(widget.image),
+                                        fit: BoxFit.cover)),
                               ),
                             )),
                 ),
@@ -139,6 +124,7 @@ class _EditProfileState extends State<EditProfile> {
                   child: SizedBox(
                     width: 380.w,
                     child: Column(
+                      spacing: 10.h,
                       children: [
                         Align(
                           alignment: Alignment.centerLeft,

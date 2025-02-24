@@ -37,11 +37,7 @@ class _NavBarState extends State<NavBar> {
   Widget build(BuildContext context) {
     final List<Widget> page = [
       Calibrate(),
-      MultiProvider(providers: [
-        ChangeNotifierProvider(
-            create: (context) => ActivityProvider(widget.idMap)),
-      ],
-      child: Activities2(plots: widget.plots, idMap: widget.idMap)),
+      Activities2(plots: widget.plots, idMap: widget.idMap),
       Profile(
         image: widget.image,
         name: widget.name,

@@ -51,7 +51,6 @@ class ActivitiesDb {
         where: 'profileId = ?', whereArgs: [profileId],
         orderBy: 'id DESC');
     listActivities = maps.map((map) => ActivitiesModel.fromMap(map)).toList();
-    // print("${list_profiles[0].plots}");
     return listActivities;
   }
 
