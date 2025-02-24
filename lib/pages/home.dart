@@ -19,13 +19,17 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int indexes = 0;
-  final CarouselSliderController _sliderController = CarouselSliderController();
+  final CarouselSliderController _carouselController =
+      CarouselSliderController();
 
   @override
   void initState() {
-    ProfileDb().getProfiles();
-    context.read<MapProvider>().refreshProfiles();
     super.initState();
+
+    //ตรวจสอบว่าโปรไฟล์มีข้อมูลหรือไม่
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MapProvider>().loadProfiles();
+    });
   }
 
   @override
@@ -45,7 +49,7 @@ class _HomeState extends State<Home> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           CarouselSlider(
-            carouselController: _sliderController,
+            carouselController: _carouselController,
             options: CarouselOptions(
                 height: 450.h,
                 enlargeCenterPage: true,
@@ -64,10 +68,6 @@ class _HomeState extends State<Home> {
                           height: 450.h,
                           child: InkWell(
                             onTap: () {
-                              print(" ID :${context
-                                  .read<MapProvider>()
-                                  .list_profiles[index]
-                                  .id}");
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -79,15 +79,15 @@ class _HomeState extends State<Home> {
                                                   .image,
                                             ),
                                             name: context
-                                                .read<MapProvider>()
+                                                .watch<MapProvider>()
                                                 .list_profiles[index]
-                                                .name,
+                                                .name ,
                                             plots: context
-                                                .read<MapProvider>()
+                                                .watch<MapProvider>()
                                                 .list_profiles[index]
                                                 .plots,
                                             idMap: context
-                                                    .read<MapProvider>()
+                                                    .watch<MapProvider>()
                                                     .list_profiles[index]
                                                     .id ??
                                                 0,
@@ -100,17 +100,18 @@ class _HomeState extends State<Home> {
                                     flex: 2,
                                     child: Ink(
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(22.5),
-                                              topRight: Radius.circular(22.5)),
-                                          image: DecorationImage(
-                                              image: FileImage(File(
-                                                context
-                                                    .watch<MapProvider>()
-                                                    .list_profiles[index]
-                                                    .image,
-                                              )),
-                                              fit: BoxFit.cover)),
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(22.5),
+                                            topRight: Radius.circular(22.5)),
+                                        image: DecorationImage(
+                                            image: FileImage(File(
+                                              context
+                                                  .watch<MapProvider>()
+                                                  .list_profiles[index]
+                                                  .image,
+                                            )),
+                                            fit: BoxFit.cover),
+                                      ),
                                     )),
                                 Expanded(
                                     flex: 1,
@@ -140,7 +141,7 @@ class _HomeState extends State<Home> {
                               ),
                               onPressed: () {
                                 setState(() {
-                                  _sliderController.previousPage();
+                                  _carouselController.previousPage();
                                   context.read<MapProvider>().removeProfile(
                                       context
                                           .read<MapProvider>()
@@ -195,16 +196,21 @@ class _HomeState extends State<Home> {
           ),
           SizedBox(
               height: 62.h,
-              width: 256.w,
+              width: 320.w,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return CreateMaps();
-                  }));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CreateMaps()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:myorchard/pages/home.dart';
+import 'package:myorchard/providers/activity_provider.dart';
+import 'package:myorchard/providers/chats_provider.dart';
 import 'package:myorchard/providers/map_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +23,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => MapProvider()),
+        ChangeNotifierProvider(create: (context) => ActivityProvider(0)),
+        ChangeNotifierProvider(create: (context) => ChatsProvider(0)),
       ],
       child: ScreenUtilInit(
         designSize: const Size(412, 917),
@@ -69,12 +73,10 @@ class MyApp extends StatelessWidget {
                       fontSize: 12.sp,
                       color: Colors.black),
                   bodyMedium: TextStyle(
-                      fontSize: 15.sp,
-                      color: Colors.black),
-                  bodyLarge: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black),
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Color.fromRGBO(115, 111, 111, 1)
+                  ),
                 ),
                 fontFamily: 'Mitr',
                 cardTheme: const CardTheme(
