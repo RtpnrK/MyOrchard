@@ -142,7 +142,8 @@ class _CreateActivityState extends State<CreateActivity> {
                                   Icon(
                                     Icons.file_upload_sharp,
                                     size: 50.h,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                                   Text('เลือกรูปภาพ',
                                       style: Theme.of(context)
@@ -256,8 +257,10 @@ class _CreateActivityState extends State<CreateActivity> {
                                         fontWeight: FontWeight.w600),
                                     decoration: InputDecoration(
                                         // isDense: true,
-                                        label: Text( widget.plots!.isEmpty?"ไม่มีแปลง":
-                                          "แปลง",
+                                        label: Text(
+                                          widget.plots!.isEmpty
+                                              ? "ไม่มีแปลง"
+                                              : "แปลง",
                                           style: TextStyle(fontSize: 18.sp),
                                         ),
                                         filled: true,

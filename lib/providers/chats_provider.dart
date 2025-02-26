@@ -33,7 +33,7 @@ class ChatsProvider extends ChangeNotifier {
       await ChatsDb().insertChat(newChat); // บันทึกลงฐานข้อมูล
       await loadChats(
           newChat.profileId); // โหลดข้อมูลใหม่เพื่อให้แน่ใจว่าอัปเดตแล้ว
-      print("เพิ่มกิจกรรมสำเร็จ");
+      print("เพิ่มกิจกรรมสำเร็จ : ${newChat.message}");
 
       // print("Activity_provider = ${listActivities.}");
     } catch (e) {
