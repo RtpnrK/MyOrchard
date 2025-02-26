@@ -129,7 +129,7 @@ class _EditProfileState extends State<EditProfile> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Padding(
-                            padding: EdgeInsets.only(left: 28.w, bottom: 10.h),
+                            padding: EdgeInsets.only(left: 28.w, bottom: 10.h, top: 20.h),
                             child: Text(
                               'ชื่อสวน',
                               style: Theme.of(context).textTheme.labelLarge,
@@ -223,7 +223,7 @@ class _EditProfileState extends State<EditProfile> {
                                   Text(
                                     'เพิ่มแปลง',
                                     style:
-                                        Theme.of(context).textTheme.bodyLarge,
+                                        Theme.of(context).textTheme.bodyMedium,
                                   )
                                 ],
                               ),
@@ -252,13 +252,9 @@ class _EditProfileState extends State<EditProfile> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                style: ButtonStyle(
-                    shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)))),
-                    backgroundColor: WidgetStatePropertyAll(Colors.redAccent)),
                 child: Text(
                   'ยกเลิก',
-                  style: TextStyle(fontSize: 32),
+                  style: TextStyle(fontSize: 25.sp),
                 ),
               ),
             ),
@@ -277,13 +273,9 @@ class _EditProfileState extends State<EditProfile> {
                       plots: plotList));
                   Navigator.pop(context);
                 },
-                style: ButtonStyle(
-                    shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)))),
-                    backgroundColor: WidgetStatePropertyAll(Colors.green)),
                 child: Text(
                   'ยืนยัน',
-                  style: TextStyle(fontSize: 32),
+                  style: TextStyle(fontSize: 25.sp),
                 ),
               ),
             )

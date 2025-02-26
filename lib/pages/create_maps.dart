@@ -27,6 +27,13 @@ class _CreateMapsState extends State<CreateMaps> {
     });
   }
 
+   Future<void> selectImageCamera() async {
+    final image = await pickImage(ImageSource.camera); // Call the function
+    setState(() {
+      selectedImage = image; // Update the state with the picked image
+    });
+  }
+
   void removePlot(int index) {
     setState(() {
       listPlotController.removeAt(index);

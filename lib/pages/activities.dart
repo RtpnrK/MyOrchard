@@ -86,7 +86,7 @@ class _ActivitiesState extends State<Activities> {
                                           .start, // จัดเนื้อหาชิดซ้าย
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text("ต้น : ${activity.tree} ",
+                                        Text("ชื่อ : ${activity.tree} ",
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodySmall),

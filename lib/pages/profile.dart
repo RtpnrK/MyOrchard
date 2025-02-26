@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:myorchard/custom_icons/customIcons.dart';
-import 'package:myorchard/pages/edit_profile.dart';
 
 class Profile extends StatefulWidget {
   final File image;
@@ -24,10 +22,10 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Center(
+      child: Padding(
         padding: EdgeInsets.only(top: 10.h),
-        child: Center(
-          child: Column(
+        child: Column(
             children: [
               Card(
                 child: Container(
@@ -39,7 +37,6 @@ class _ProfileState extends State<Profile> {
                           image: FileImage(widget.image), fit: BoxFit.cover)),
                 ),
               ),
-              Spacer(),
               Card(
                   child: Container(
                 width: 380.w,
@@ -58,7 +55,7 @@ class _ProfileState extends State<Profile> {
                         children: [
                           Text(
                             "ชื่อ : ",
-                            style: Theme.of(context).textTheme.bodyLarge,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           widget.name.isEmpty
                               ? Text("ไม่ได้ใส่ข้อมูล")
@@ -73,7 +70,7 @@ class _ProfileState extends State<Profile> {
                         children: [
                           Text(
                             "แปลง : ",
-                            style: Theme.of(context).textTheme.bodyLarge,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           Expanded(
                             child: SizedBox(
@@ -94,7 +91,7 @@ class _ProfileState extends State<Profile> {
               ))
             ],
           ),
-        ),
-      );
+      ),
+    );
   }
 }

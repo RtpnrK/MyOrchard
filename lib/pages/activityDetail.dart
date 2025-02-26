@@ -138,8 +138,8 @@ class _ActivityDetailState extends State<ActivityDetail> {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      width: width,
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 10.h),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -184,16 +184,9 @@ class _ActivityDetailState extends State<ActivityDetail> {
                                       );
                                     });
                               },
-                              style: ButtonStyle(
-                                  shape: WidgetStatePropertyAll(
-                                      RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(20)))),
-                                  backgroundColor:
-                                      WidgetStatePropertyAll(Colors.redAccent)),
                               child: Text(
                                 'ลบ',
-                                style: TextStyle(fontSize: 32),
+                                style: TextStyle(fontSize: 28.sp),
                               ),
                             ),
                           ),
@@ -210,16 +203,9 @@ class _ActivityDetailState extends State<ActivityDetail> {
                                               plots: widget.plots,
                                             )));
                               },
-                              style: ButtonStyle(
-                                  shape: WidgetStatePropertyAll(
-                                      RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(20)))),
-                                  backgroundColor:
-                                      WidgetStatePropertyAll(Colors.green)),
                               child: Text(
                                 'แก้ไข',
-                                style: TextStyle(fontSize: 32),
+                                style: TextStyle(fontSize: 28.sp),
                               ),
                             ),
                           )
@@ -234,21 +220,17 @@ class _ActivityDetailState extends State<ActivityDetail> {
           Positioned(
               top: 35,
               left: 10,
-              child: Container(
-                width: 50.w,
-                height: 50.h,
-                decoration:
-                    BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                padding: EdgeInsets.only(left: 12.sp),
-                child: InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Icon(
-                      Icons.arrow_back_ios,
-                      color: Theme.of(context).colorScheme.secondary,
-                      size: 40.sp,
-                    )),
+              child: IconButton.filled(
+                style: IconButton.styleFrom(
+                  shape: const CircleBorder(),
+                  backgroundColor: Colors.white,
+                ),
+                onPressed: (){
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.arrow_back_ios,
+                color: Theme.of(context).colorScheme.secondary,
+                size: 30.sp,)
               ))
         ],
       ),

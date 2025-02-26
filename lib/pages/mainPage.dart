@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:myorchard/calibrate.dart';
 import 'package:myorchard/custom_icons/customIcons.dart';
+import 'package:myorchard/database/activities_db.dart';
+import 'package:myorchard/models/activities_model.dart';
 import 'package:myorchard/pages/activities.dart';
 import 'package:myorchard/pages/chat.dart';
 import 'package:myorchard/pages/create_activity.dart';
@@ -123,7 +125,9 @@ class _MainPageState extends State<MainPage> {
               size: 32.sp,
               color: Theme.of(context).colorScheme.secondary,
             ),
-            onPressed: () {},
+            onPressed: () {
+              export2csv();
+            },
           ),
         ),
         Padding(
@@ -296,7 +300,14 @@ class _MainPageState extends State<MainPage> {
       ][pageIndex],
       floatingActionButton: [
         null,
-        FloatingActionButton(
+        SizedBox(
+          width: 50.w,
+          height: 50.h,
+          child: IconButton.filled(
+            style: IconButton.styleFrom(
+              shape: CircleBorder(),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+            ),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return CreateActivity(
@@ -305,10 +316,16 @@ class _MainPageState extends State<MainPage> {
                 );
               }));
             },
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            child: Icon(Icons.add)),
+            icon: Icon(Icons.add, size: 30.sp,)),
+        ),
         null
       ][pageIndex],
     );
+  }
+
+  Future<void> export2csv() async {
+    List<ActivitiesModel> activitiesList = await ActivitiesDb().getActivities(widget.idMap);
+    activitiesList.forEach((e) {
+    });
   }
 }
