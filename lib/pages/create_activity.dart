@@ -52,22 +52,63 @@ class _CreateActivityState extends State<CreateActivity> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const Text('เลือกรูปจาก'),
-                  ElevatedButton.icon(
-                    icon: Icon(Icons.photo_size_select_actual_rounded),
-                    iconAlignment: IconAlignment.end,
-                    label: const Text('เลือกรูปจากแกลเลอรี่'),
-                    style:
-                        ElevatedButton.styleFrom(fixedSize: Size(400.w, 10.h)),
-                    onPressed: () => selectImageGallery(),
+                  Text(
+                    'เลือกรูปจาก',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Colors.black, fontWeight: FontWeight.normal),
                   ),
-                  ElevatedButton.icon(
-                      onPressed: () => selectImageCamera(),
-                      icon: Icon(Icons.camera_alt_outlined),
-                      iconAlignment: IconAlignment.end,
-                      style: ElevatedButton.styleFrom(
-                          fixedSize: Size(400.w, 10.h)),
-                      label: Text("ถ่ายรูป"))
+                  Divider(),
+                  InkWell(
+                      onTap: () {
+                        selectImageGallery();
+                        Navigator.pop(context);
+                      },
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 8.w,
+                          children: [
+                            Text(
+                              "เลือกรูปจากแกลเลอรี่",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge
+                                  ?.copyWith(
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.normal),
+                            ),
+                            Icon(
+                              Icons.photo_size_select_actual_rounded,
+                              size: 24.sp,
+                              color: Colors.grey,
+                            )
+                          ])),
+                  Divider(),
+                  InkWell(
+                    onTap: () {
+                      selectImageCamera();
+                      Navigator.pop(context);
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 8.w,
+                      children: [
+                        Text(
+                          "ถ่ายภาพ",
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.normal),
+                        ),
+                        Icon(
+                          Icons.camera_alt,
+                          size: 24.sp,
+                          color: Colors.grey,
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
             ),
@@ -141,7 +182,8 @@ class _CreateActivityState extends State<CreateActivity> {
                                   Icon(
                                     Icons.file_upload_sharp,
                                     size: 50.h,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                                   Text('เลือกรูปภาพ',
                                       style: Theme.of(context)
@@ -255,8 +297,10 @@ class _CreateActivityState extends State<CreateActivity> {
                                         fontWeight: FontWeight.w600),
                                     decoration: InputDecoration(
                                         // isDense: true,
-                                        label: Text( widget.plots!.isEmpty?"ไม่มีแปลง":
-                                          "แปลง",
+                                        label: Text(
+                                          widget.plots!.isEmpty
+                                              ? "ไม่มีแปลง"
+                                              : "แปลง",
                                           style: TextStyle(fontSize: 18.sp),
                                         ),
                                         filled: true,

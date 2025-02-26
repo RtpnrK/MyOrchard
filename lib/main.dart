@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
                       fontSize: 20.sp,
                       color: const Color.fromRGBO(98, 114, 84, 1)),
                   bodySmall: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 18.sp,
                       color: Colors.black),
                   bodyMedium: TextStyle(
                     fontSize: 28.sp,

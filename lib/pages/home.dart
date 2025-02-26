@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:myorchard/components/nav_bar.dart';
-import 'package:myorchard/database/maps_db.dart';
 import 'package:myorchard/pages/mainPage.dart';
 import 'package:myorchard/pages/create_maps.dart';
 import 'package:myorchard/providers/map_provider.dart';
