@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:csv/csv.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:myorchard/calibrate.dart';
@@ -13,6 +17,7 @@ import 'package:myorchard/pages/chat.dart';
 import 'package:myorchard/pages/create_activity.dart';
 import 'package:myorchard/pages/edit_profile.dart';
 import 'package:myorchard/pages/profile.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MainPage extends StatefulWidget {
   final File image;
@@ -301,8 +306,8 @@ class _MainPageState extends State<MainPage> {
       floatingActionButton: [
         null,
         SizedBox(
-          width: 50.w,
-          height: 50.h,
+          width: 60.w,
+          height: 60.h,
           child: IconButton.filled(
             style: IconButton.styleFrom(
               shape: CircleBorder(),
@@ -324,8 +329,25 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> export2csv() async {
+    List<String> header = ['no.', 'name', 'activity', 'detail', 'date'];
+    List<List<String>> data = [];
     List<ActivitiesModel> activitiesList = await ActivitiesDb().getActivities(widget.idMap);
-    activitiesList.forEach((e) {
-    });
+    for (int i = 0; i < activitiesList.length; i++) {
+      data.add([
+        (i+1).toString(), 
+        activitiesList[i].tree!, 
+        activitiesList[i].activity!,
+        activitiesList[i].details!,
+        activitiesList[i].date!]);
+    }
+    data.insert(0, header);
+    String csv = ListToCsvConverter().convert(data);
+    Uint8List csvBytes = utf8.encode(csv); 
+    
+    await FilePicker.platform.saveFile(
+      bytes: csvBytes,
+      dialogTitle: 'Save CSV File',
+      fileName: 'data.csv',
+    );
   }
 }

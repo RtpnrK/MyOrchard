@@ -604,6 +604,9 @@ class _CalibrateState extends State<Calibrate> {
           return const Center(child: CircularProgressIndicator());
         });
     await _getCurrentLocation();
+    while(position.accuracy > 15) {
+      await _getCurrentLocation();
+    }
     if (mounted) {
       Navigator.of(context).pop();
     }

@@ -45,7 +45,7 @@ class ChatsDb {
   Future<List<ChatModel>> getChats(int profileId) async {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.query('testChats',
-        where: 'profileId = ?', whereArgs: [profileId], orderBy: 'id DESC');
+        where: 'profileId = ?', whereArgs: [profileId],);
     listChats = maps.map((map) => ChatModel.fromMap(map)).toList();
     return listChats;
   }
