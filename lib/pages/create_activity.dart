@@ -385,9 +385,9 @@ class _CreateActivityState extends State<CreateActivity> {
               height: 58.h,
               child: FilledButton(
                 onPressed: () {
-                  if (selectedImage != null) {
+                 
                     context.read<ActivityProvider>().addActivity(
-                        selectedImage!.path,
+                        selectedImage?.path ?? '',
                         treeController.text,
                         detailController.text,
                         activityController.text,
@@ -398,14 +398,7 @@ class _CreateActivityState extends State<CreateActivity> {
                         .read<ActivityProvider>()
                         .loadActivities(widget.idMap);
                     Navigator.pop(context);
-                  } else {
-                    // Handle the case where the image is not selected
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('กรุณาเลือกรูปภาพ'),
-                      ),
-                    );
-                  }
+                  
                 },
                 style: ButtonStyle(
                     shape: WidgetStatePropertyAll(RoundedRectangleBorder(

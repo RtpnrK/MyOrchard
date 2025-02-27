@@ -7,12 +7,19 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ml_linalg/linalg.dart';
+import 'package:myorchard/database/pins_db.dart';
+import 'package:myorchard/models/pinModel.dart';
 import 'package:myorchard/optimize.dart';
+import 'package:myorchard/providers/pins_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:sqflite/utils/utils.dart';
 
 class Calibrate extends StatefulWidget {
   final File image;
   final double? scale;
-  const Calibrate({super.key, required this.image, this.scale});
+  final int profileId;
+  const Calibrate(
+      {super.key, required this.profileId, required this.image, this.scale});
 
   @override
   State<Calibrate> createState() => _CalibrateState();
@@ -39,9 +46,29 @@ class _CalibrateState extends State<Calibrate> {
 
   @override
   void initState() {
+    super.initState();
     viewTranformationController.value = Matrix4.identity() * widget.scale;
     _checkPermission();
-    super.initState();
+
+    if (context.read<PinsProvider>().listPins.isNotEmpty) {
+      context.read<PinsProvider>().listPins.asMap().forEach((index, p) {
+        pinList.add(Pin(
+          Offset(p.offsetX, p.offsetY),
+          Color(int.parse(p.color, radix: 16)),
+        ));
+        pinList[index].addPosition(Position(
+            longitude: p.longitude,
+            latitude: p.latitude,
+            timestamp: DateTime.now(),
+            accuracy: 0,
+            altitude: 0,
+            altitudeAccuracy: 0,
+            heading: 0,
+            headingAccuracy: 0,
+            speed: 0,
+            speedAccuracy: 0));
+      });
+    }
   }
 
   @override
@@ -73,10 +100,39 @@ class _CalibrateState extends State<Calibrate> {
           style: Theme.of(context).textTheme.headlineLarge,
         ),
         actions: [
+          InkWell(
+            onTap: () {
+              print(context.read<PinsProvider>().listPins.length);
+              PinsDb().deleteAllPins();
+              setState(() {
+                pinList.clear();
+              });
+            },
+            child: Icon(Icons.ac_unit_sharp),
+          ),
           Padding(
             padding: EdgeInsets.only(top: 10.h),
             child: TextButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                print(
+                    "length : ${context.read<PinsProvider>().listPins.length}");
+                if (context.read<PinsProvider>().listPins.isNotEmpty) {
+                  print("is not empty");
+                  PinsDb().deleteAllPins();
+                }
+                print("is empty");
+                for (var e in pinList) {
+                  context.read<PinsProvider>().addPin(
+                      widget.profileId,
+                      e.position.latitude,
+                      e.position.longitude,
+                      e.pinOffset.dx,
+                      e.pinOffset.dy,
+                      e.pinColor.toHexString());
+                }
+
+                debugPrint("Add Pins : ${pinList.length}");
+              },
               label: Text('บันทึก'),
               icon: Icon(
                 Icons.save,
@@ -153,7 +209,7 @@ class _CalibrateState extends State<Calibrate> {
                       pinList.forEach((Pin p) {
                         errAvg += p.position.accuracy;
                       });
-                      errAvg /= pinList.length;    
+                      errAvg /= pinList.length;
                       showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
@@ -169,7 +225,8 @@ class _CalibrateState extends State<Calibrate> {
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Text(
                                         'จำนวน pin: ${pinList.length}',
@@ -214,9 +271,10 @@ class _CalibrateState extends State<Calibrate> {
                         style: TextStyle(fontSize: 20.sp),
                       )));
                     },
-              label: Text('Calibrate', style: TextStyle(
-                fontSize: 16.sp
-              ),),
+              label: Text(
+                'Calibrate',
+                style: TextStyle(fontSize: 16.sp),
+              ),
               icon: ImageIcon(
                 AssetImage('assets/icons/calibrate.png'),
                 size: 25.sp,
@@ -279,25 +337,41 @@ class _CalibrateState extends State<Calibrate> {
                                                         size: 40.sp,
                                                       ),
                                                       title: Text(
-                                                          'Pin No.${idx + 1}',
-                                                          style: Theme.of(context).textTheme.bodyMedium,),
+                                                        'Pin No.${idx + 1}',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyMedium,
+                                                      ),
                                                       subtitle: Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
                                                                 .start,
                                                         children: [
                                                           Text(
-                                                              'Pixel Offset: ${pinList[idx].pinOffset.toString()}',
-                                                              style: Theme.of(context).textTheme.bodySmall,),
+                                                            'Pixel Offset: ${pinList[idx].pinOffset.toString()}',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodySmall,
+                                                          ),
                                                           Text(
                                                               'Latitude: ${pinList[idx].position.latitude}',
-                                                              style: Theme.of(context).textTheme.bodySmall),
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .bodySmall),
                                                           Text(
                                                               'Longtitude: ${pinList[idx].position.longitude}',
-                                                              style: Theme.of(context).textTheme.bodySmall),
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .bodySmall),
                                                           Text(
                                                             'Error: ${pinList[idx].position.accuracy.toStringAsFixed(2)} เมตร',
-                                                            style: Theme.of(context).textTheme.bodySmall,
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodySmall,
                                                           )
                                                         ],
                                                       ),
@@ -339,7 +413,8 @@ class _CalibrateState extends State<Calibrate> {
                               child: Column(
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
                                       Text('ขนาด Pin'),
                                       Row(
@@ -364,7 +439,8 @@ class _CalibrateState extends State<Calibrate> {
                                     ],
                                   ),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
                                       Text('ขั้นสูง (ใช้เวลานานขึ้น)'),
                                       Switch(
@@ -586,14 +662,14 @@ class _CalibrateState extends State<Calibrate> {
   }
 
   Future<void> _getCurrentLocation() async {
-      Position currentPosition = await Geolocator.getCurrentPosition(
-          locationSettings: AndroidSettings(accuracy: LocationAccuracy.best));
+    Position currentPosition = await Geolocator.getCurrentPosition(
+        locationSettings: AndroidSettings(accuracy: LocationAccuracy.best));
 
-      setState(() {
-        position = currentPosition;
-        lat = currentPosition.latitude;
-        long = currentPosition.longitude;
-      });
+    setState(() {
+      position = currentPosition;
+      lat = currentPosition.latitude;
+      long = currentPosition.longitude;
+    });
   }
 
   Future<void> _loadingState() async {
@@ -649,7 +725,7 @@ class _CalibrateState extends State<Calibrate> {
           pinList[end].position.longitude);
       totalDistance += d;
     } else {
-        return;
+      return;
     }
   }
 }

@@ -2,33 +2,33 @@
 
 class PinM {
   int? id;
+  int profileId;
   double latitude;
   double longitude;
   double offsetX;
   double offsetY;
   String color;
-  
 
   PinM({
     this.id,
+    required this.profileId,
     required this.latitude,
     required this.longitude,
     required this.offsetX,
     required this.offsetY,
     required this.color,
-   
   });
 
   // Convert a Pin into a Map. The keys must correspond to the names of the columns in the database.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'profileId': profileId,
       'latitude': latitude,
       'longitude': longitude,
       'offsetX': offsetX,
       'offsetY': offsetY,
       'color': color,
-      
     };
   }
 
@@ -36,14 +36,12 @@ class PinM {
   factory PinM.fromMap(Map<String, dynamic> map) {
     return PinM(
       id: map['id'],
+      profileId: map['profileId'],
       latitude: map['latitude'],
       longitude: map['longitude'],
       offsetX: map['offsetX'],
       offsetY: map['offsetY'],
       color: map['color'],
-      
     );
   }
-
-   
 }

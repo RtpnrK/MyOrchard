@@ -26,7 +26,7 @@ class ActivityProvider extends ChangeNotifier {
 
   // เพิ่มกิจกรรม
   Future<void> addActivity(
-      String image, tree, details, activity, date, plot, int profileId) async {
+      String? image, tree, details, activity, date, plot, int profileId) async {
     try {
       final newActivity = ActivitiesModel(
           image: image,

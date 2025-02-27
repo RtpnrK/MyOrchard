@@ -5,6 +5,7 @@ import 'package:myorchard/pages/home.dart';
 import 'package:myorchard/providers/activity_provider.dart';
 import 'package:myorchard/providers/chats_provider.dart';
 import 'package:myorchard/providers/map_provider.dart';
+import 'package:myorchard/providers/pins_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => MapProvider()),
         ChangeNotifierProvider(create: (context) => ActivityProvider(0)),
         ChangeNotifierProvider(create: (context) => ChatsProvider(0)),
+        ChangeNotifierProvider(create: ((context) => PinsProvider(0)))
       ],
       child: ScreenUtilInit(
         designSize: const Size(412, 917),

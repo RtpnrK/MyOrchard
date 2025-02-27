@@ -151,7 +151,10 @@ class _CreateMapsState extends State<CreateMaps> {
                                     isDense: true,
                                     filled: true,
                                     fillColor: Colors.white,
-                                    label: Text('ชื่อสวน'),
+                                    label: Text('ชื่อสวน',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
@@ -163,10 +166,10 @@ class _CreateMapsState extends State<CreateMaps> {
                               alignment: Alignment.centerLeft,
                               child: Padding(
                                 padding: EdgeInsets.only(
-                                    left: 28.w, top: 10.h, bottom: 10.h),
+                                    left: 20.w, top: 10.h, bottom: 8.h),
                                 child: Text(
                                   'แปลง',
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ),
                             ),
@@ -174,7 +177,7 @@ class _CreateMapsState extends State<CreateMaps> {
                               child: ListView.builder(
                                   physics: NeverScrollableScrollPhysics(),
                                   padding: EdgeInsets.only(
-                                      left: 20.w, right: 20.w, bottom: 10.h),
+                                      left: 20.w, right: 20.w, bottom: 8.h),
                                   shrinkWrap: true,
                                   itemCount: listPlotController.length,
                                   itemBuilder: (context, index) {
@@ -192,7 +195,11 @@ class _CreateMapsState extends State<CreateMaps> {
                                                 filled: true,
                                                 fillColor: Colors.white,
                                                 label: Text(
-                                                    "แปลงที่ ${index + 1}"),
+                                                  "แปลงที่ ${index + 1}",
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall,
+                                                ),
                                                 border: OutlineInputBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -234,7 +241,8 @@ class _CreateMapsState extends State<CreateMaps> {
                                         'เพิ่มแปลง',
                                         style: Theme.of(context)
                                             .textTheme
-                                            .bodyLarge,
+                                            .displaySmall
+                                            ?.copyWith(color: Colors.grey),
                                       )
                                     ],
                                   ),
@@ -250,57 +258,54 @@ class _CreateMapsState extends State<CreateMaps> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 10.h),
                     child: SizedBox(
-                    height: 60.h,
-                    width: 380.w,
-                    child: ElevatedButton.icon(
-                      iconAlignment: IconAlignment.start,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                      height: 60.h,
+                      width: 380.w,
+                      child: ElevatedButton.icon(
+                        iconAlignment: IconAlignment.start,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          if (mapNameController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: const Text("กรุณากรอกชื่อสวน"),
+                            ));
+                            return;
+                          }
+
+                          context.read<MapProvider>().addProfile(
+                              selectedImage?.path ?? '',
+                              mapNameController.text,
+                              listPlotController
+                                  .map((listPlot) => listPlot.text)
+                                  .toList());
+                          Navigator.pop(context);
+                        },
+                        label: Text(
+                          'ยืนยัน',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.surface,
+                              ),
+                        ),
+                        icon: Icon(
+                          Icons.create,
+                          size: 28.sp,
                         ),
                       ),
-                      onPressed: () {
-                        if (selectedImage == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: const Text("กรุณาเลือกรูปภาพ"),
-                          ));
-                          return;
-                        }
-                        if (mapNameController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: const Text("กรุณากรอกชื่อสวน"),
-                          ));
-                          return;
-                        }
-
-                        context.read<MapProvider>().addProfile(
-                            selectedImage!.path,
-                            mapNameController.text,
-                            listPlotController
-                                .map((listPlot) => listPlot.text)
-                                .toList());
-                        Navigator.pop(context);
-                      },
-                      label: Text(
-                        'ยืนยัน',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.surface,
-                            ),
-                      ),
-                      icon: Icon(
-                        Icons.create,
-                        size: 28.sp,
-                      ),
                     ),
-                  ),)
+                  )
                 ],
               ),
             ),
           ),
         ));
-    //   bottomNavigationBar:
-    // );
   }
 }

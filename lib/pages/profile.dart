@@ -39,7 +39,6 @@ class _ProfileState extends State<Profile> {
                           image: FileImage(widget.image), fit: BoxFit.cover)),
                 ),
               ),
-              Spacer(),
               Card(
                   child: Container(
                 width: 380.w,
