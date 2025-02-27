@@ -1,19 +1,21 @@
 // database_helper.dart
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:myorchard/models/pinModel.dart';
 
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-class DatabaseHelper {
+class PinsDb {
   // Singleton instance
-  static final DatabaseHelper _instance = DatabaseHelper._internal();
-  factory DatabaseHelper() => _instance;
-  DatabaseHelper._internal();
-
+  static final PinsDb _instance = PinsDb._internal();
+  factory PinsDb() => _instance;
+  PinsDb._internal();
   static Database? _database;
+
+  List<PinM> listPins = [];
 
   // Initialize the database
   Future<Database> get database async {
@@ -25,7 +27,7 @@ class DatabaseHelper {
   // Open the database and create table if it doesn't exist
   Future<Database> _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "pins_New.db");
+    String path = join(documentsDirectory.path, "testPins.db");
     return await openDatabase(
       path,
       version: 1,
@@ -36,14 +38,15 @@ class DatabaseHelper {
   // Create the pins table
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE pins_New (
+      CREATE TABLE testPins (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        profileId INTEGER NOT NULL,
         latitude REAL NOT NULL,
         longitude REAL NOT NULL,
         offsetX REAL NOT NULL,
         offsetY REAL NOT NULL,
-        color TEXT NOT NULL
-        
+        color TEXT NOT NULL,
+        FOREIGN KEY (profileId) REFERENCES testProfile(id)
       )
     ''');
   }
@@ -51,40 +54,35 @@ class DatabaseHelper {
   // Insert a new pin
   Future<int> insertPin(PinM pin) async {
     Database db = await database;
-    return await db.insert('pins_New', pin.toMap());
+    return await db.insert('testPins', pin.toMap());
   }
 
   // Retrieve all pins
-  Future<List<PinM>> getPins() async {
+  Future<List<PinM>> getPins(int? profileId) async {
     Database db = await database;
-    List<Map<String, dynamic>> maps = await db.query('pins_New');
-    return maps.map((map) => PinM.fromMap(map)).toList();
+    List<Map<String, dynamic>> maps = await db
+        .query('testPins', where: 'profileId = ?', whereArgs: [profileId]);
+    listPins = maps.map((map) => PinM.fromMap(map)).toList();
+
+    return listPins;
   }
 
   Future<int> deleteAllPins() async {
     Database db = await database;
-    return await db.delete('pins_New'); // ไม่มีเงื่อนไข จะลบข้อมูลทั้งหมด
-}
-  void fetchPins() async {
-    List<PinM> pins = await getPins();
-    Database db = await database;
-    List<Map<String, dynamic>> maps = await db.query('pins_New');
-    for(var m in maps) {
-      print(m.toString());
-    }
+    debugPrint("Delete All Pins");
+    return await db.delete('testPins'); // ไม่มีเงื่อนไข จะลบข้อมูลทั้งหมด
   }
 
-
   // Delete a pin
-  Future<int> deletePin(int id) async {
+  Future<int> deletePin(int? id) async {
     Database db = await database;
-    return await db.delete('pins_New', where: 'id = ?', whereArgs: [id]);
+    return await db.delete('testPins', where: 'id = ?', whereArgs: [id]);
   }
 
   // Update a pin
   Future<int> updatePin(PinM pin) async {
     Database db = await database;
     return await db
-        .update('pins_New', pin.toMap(), where: 'id = ?', whereArgs: [pin.id]);
+        .update('testPins', pin.toMap(), where: 'id = ?', whereArgs: [pin.id]);
   }
 }

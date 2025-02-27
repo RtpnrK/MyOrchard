@@ -194,49 +194,97 @@ class _ChatState extends State<Chat> {
                                       ]));
                             });
                       },
-                      child: Padding(
-                        padding: EdgeInsets.only(bottom: 8.h),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                                maxWidth: 320.w, maxHeight: 320.h),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                    top: 4.h,
-                                    bottom: 4.h,
-                                    left: 8.w,
-                                    right: 8.w),
-                                child: isFile(context
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 8.h),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                    maxWidth: 320.w, maxHeight: 320.h),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 4.h,
+                                        bottom: 4.h,
+                                        left: 8.w,
+                                        right: 8.w),
+                                    child: isFile(context
+                                                .watch<ChatsProvider>()
+                                                .listChats[index]
+                                                .message) ==
+                                            false
+                                        ? Text(
+                                            context
+                                                .watch<ChatsProvider>()
+                                                .listChats[index]
+                                                .message,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary),
+                                          )
+                                        : Image.file(File(context
                                             .watch<ChatsProvider>()
                                             .listChats[index]
-                                            .message) ==
-                                        false
-                                    ? Text(
-                                        context
-                                            .watch<ChatsProvider>()
-                                            .listChats[index]
-                                            .message,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .secondary),
-                                      )
-                                    : Image.file(File(context
-                                        .watch<ChatsProvider>()
-                                        .listChats[index]
-                                        .message)),
+                                            .message)),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                          if (context
+                                      .watch<ChatsProvider>()
+                                      .listChats[index]
+                                      .date !=
+                                  DateFormat.yMd().format(DateTime.now()) &&
+                              (index !=
+                                  context
+                                          .watch<ChatsProvider>()
+                                          .listChats
+                                          .length -
+                                      1) && context
+                                      .watch<ChatsProvider>()
+                                      .listChats[index]
+                                      .date != context
+                                      .watch<ChatsProvider>()
+                                      .listChats[index + 1]
+                                      .date)
+                            SizedBox(
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    spacing: 10.w,
+                                    children: [
+                                  SizedBox(
+                                    width: 130.w,
+                                    child: Divider(
+                                      thickness: 2,
+                                    ),
+                                  ),
+                                  Text(
+                                    context
+                                        .watch<ChatsProvider>()
+                                        .listChats[index]
+                                        .date,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displaySmall,
+                                  ),
+                                  SizedBox(
+                                    width: 130.w,
+                                    child: Divider(
+                                      thickness: 2,
+                                    ),
+                                  ),
+                                ])),
+                        ],
                       ),
                     ),
                   );

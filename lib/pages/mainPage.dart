@@ -17,7 +17,8 @@ import 'package:myorchard/pages/chat.dart';
 import 'package:myorchard/pages/create_activity.dart';
 import 'package:myorchard/pages/edit_profile.dart';
 import 'package:myorchard/pages/profile.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:myorchard/providers/pins_provider.dart';
+import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
   final File image;
@@ -48,6 +49,7 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     Image img = Image.file(widget.image);
     imageScaling(img);
+    context.read<PinsProvider>().loadPins(widget.idMap);
     super.initState();
   }
 
@@ -76,40 +78,14 @@ class _MainPageState extends State<MainPage> {
           padding: EdgeInsets.only(top: 12.h),
           child: TextButton.icon(
             onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                      title: Text(
-                        'เลือกโปรไฟล์การปรับเทียบ',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      content: SizedBox(
-                        height: 300.h,
-                        child: Column(
-                          children: [
-                            ListTile(
-                              leading: Icon(
-                                Icons.add,
-                                size: 20.sp,
-                              ),
-                              title: Text(
-                                'เพิ่มการปรับเทียบ',
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Calibrate(
-                                              image: widget.image,
-                                              scale: scaleFactor,
-                                            )));
-                              },
-                            )
-                          ],
-                        ),
-                      )));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Calibrate(
+                            image: widget.image,
+                            scale: scaleFactor,
+                            profileId: widget.idMap,
+                          )));
             },
             label: Text('ปรับเทียบ'),
             iconAlignment: IconAlignment.end,
@@ -144,9 +120,11 @@ class _MainPageState extends State<MainPage> {
               color: Theme.of(context).colorScheme.secondary,
             ),
             onPressed: () {
-               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return Chat(profileId: widget.idMap,);
-                }));
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return Chat(
+                  profileId: widget.idMap,
+                );
+              }));
             },
           ),
         ),
