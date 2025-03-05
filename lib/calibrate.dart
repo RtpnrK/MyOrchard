@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -8,11 +9,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ml_linalg/linalg.dart';
 import 'package:myorchard/database/pins_db.dart';
-import 'package:myorchard/models/pinModel.dart';
 import 'package:myorchard/optimize.dart';
 import 'package:myorchard/providers/pins_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/utils/utils.dart';
 
 class Calibrate extends StatefulWidget {
   final File image;
@@ -32,6 +31,7 @@ class _CalibrateState extends State<Calibrate> {
   double totalDistance = 0;
   bool advanceMode = false;
   bool isPin = false;
+  bool isCalibrate = false;
   Color pinColor = Colors.transparent;
   Color pickerColor = Colors.transparent;
   List<Pin> pinList = [];
@@ -43,6 +43,7 @@ class _CalibrateState extends State<Calibrate> {
   Optimize? opt;
   late Position position;
   StreamSubscription<Position>? positionStreamSubscription;
+  late LocationPermission permission;
 
   @override
   void initState() {
@@ -69,6 +70,9 @@ class _CalibrateState extends State<Calibrate> {
             speedAccuracy: 0));
       });
     }
+    setState(() {
+      index = pinList.length;
+    });
   }
 
   @override
@@ -100,20 +104,13 @@ class _CalibrateState extends State<Calibrate> {
           style: Theme.of(context).textTheme.headlineLarge,
         ),
         actions: [
-          InkWell(
-            onTap: () {
-              print(context.read<PinsProvider>().listPins.length);
-              PinsDb().deleteAllPins();
-              setState(() {
-                pinList.clear();
-              });
-            },
-            child: Icon(Icons.ac_unit_sharp),
-          ),
           Padding(
             padding: EdgeInsets.only(top: 10.h),
             child: TextButton.icon(
-              onPressed: () {
+              onPressed: isCalibrate?() {
+                setState(() {
+                  isCalibrate = false;
+                });
                 print(
                     "length : ${context.read<PinsProvider>().listPins.length}");
                 if (context.read<PinsProvider>().listPins.isNotEmpty) {
@@ -132,7 +129,7 @@ class _CalibrateState extends State<Calibrate> {
                 }
 
                 debugPrint("Add Pins : ${pinList.length}");
-              },
+              }:null,
               label: Text('บันทึก'),
               icon: Icon(
                 Icons.save,
@@ -206,9 +203,12 @@ class _CalibrateState extends State<Calibrate> {
               onPressed: pinList.length >= 3
                   ? () {
                       double errAvg = 0;
+                      List<double> errList = [];
                       pinList.forEach((Pin p) {
                         errAvg += p.position.accuracy;
+                        errList.add(p.position.accuracy);
                       });
+                      double errMax = errList.reduce(max);
                       errAvg /= pinList.length;
                       showDialog(
                           context: context,
@@ -221,7 +221,7 @@ class _CalibrateState extends State<Calibrate> {
                                 contentPadding: EdgeInsets.all(20.sp),
                                 content: SizedBox(
                                   width: double.maxFinite,
-                                  height: 150,
+                                  height: 200,
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -245,6 +245,12 @@ class _CalibrateState extends State<Calibrate> {
                                         style: Theme.of(context)
                                             .textTheme
                                             .displayMedium,
+                                      ),
+                                      Text(
+                                        'Error สูงสุด: ${errMax.toStringAsFixed(2)} เมตร',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayMedium,
                                       )
                                     ],
                                   ),
@@ -256,6 +262,7 @@ class _CalibrateState extends State<Calibrate> {
                                       await _calibrate();
                                       _startLocationUpdates();
                                       setState(() {
+                                        isCalibrate = true;
                                         Navigator.of(context).pop();
                                       });
                                     },
@@ -404,54 +411,43 @@ class _CalibrateState extends State<Calibrate> {
                         StatefulBuilder(builder: (context, setDialogState) {
                           return AlertDialog(
                             title: Text(
-                              'ตั้งค่า',
+                              'ขนาด Pin',
+                              style: Theme.of(context).textTheme.headlineMedium,
                               textAlign: TextAlign.center,
                             ),
                             content: SizedBox(
-                              height: 200.h,
+                              height: 100.h,
                               width: double.maxFinite,
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                    spacing: 15.w,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text('ขนาด Pin'),
-                                      Row(
-                                        children: [
-                                          IconButton(
-                                              onPressed: () {
-                                                setDialogState(() {
-                                                  size -= 5;
-                                                });
-                                              },
-                                              icon: Icon(Icons.remove)),
-                                          Text('$size'),
-                                          IconButton(
-                                              onPressed: () {
-                                                setDialogState(() {
-                                                  size += 5;
-                                                });
-                                              },
-                                              icon: Icon(Icons.add)),
-                                        ],
-                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            setDialogState(() {
+                                              size -= 5;
+                                            });
+                                          },
+                                          icon: Icon(
+                                            Icons.remove_circle, 
+                                            color: Theme.of(context).primaryColor,
+                                            size: 40.sp,)),
+                                      Text('$size', style: TextStyle(fontSize: 20.sp),),
+                                      IconButton(
+                                          onPressed: () {
+                                            setDialogState(() {
+                                              size += 5;
+                                            });
+                                          },
+                                          icon: Icon(
+                                            Icons.add_circle, 
+                                            color: Theme.of(context).primaryColor,
+                                            size: 40.sp,)),
                                     ],
                                   ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Text('ขั้นสูง (ใช้เวลานานขึ้น)'),
-                                      Switch(
-                                          value: mode,
-                                          onChanged: (value) {
-                                            setDialogState(() {
-                                              mode = value;
-                                            });
-                                          })
-                                    ],
-                                  )
                                 ],
                               ),
                             ),
@@ -461,7 +457,7 @@ class _CalibrateState extends State<Calibrate> {
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('ยกเลิก')),
+                                  child: Text('ยกเลิก', style: TextStyle(fontSize: 18.sp))),
                               ElevatedButton(
                                   onPressed: () {
                                     setState(() {
@@ -470,7 +466,7 @@ class _CalibrateState extends State<Calibrate> {
                                     });
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('ตกลง'))
+                                  child: Text('ตกลง', style: TextStyle(fontSize: 18.sp)))
                             ],
                           );
                         }));
@@ -625,13 +621,12 @@ class _CalibrateState extends State<Calibrate> {
     ], dtype: DType.float64);
     var current_sp = opt!.toSP(current_gp);
     myPosition = Offset(current_sp[0][0], current_sp[1][0]);
-    log('Screen Position = \n ${current_sp.toString()}');
-    log('Global Position = \n ${current_gp.toString()}');
+    // log('Screen Position = \n ${current_sp.toString()}');
+    // log('Global Position = \n ${current_gp.toString()}');
   }
 
   Future<void> _checkPermission() async {
     bool serviceEnabled;
-    LocationPermission permission;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -653,10 +648,16 @@ class _CalibrateState extends State<Calibrate> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      setState(() {
-        message =
-            'Location permissions are permanently denied, we cannot request permissions.';
-      });
+      showDialog(context: context, builder: (context) => AlertDialog(
+        title: Text('กรุณาเปิดการใช้งาน Location', style: Theme.of(context).textTheme.headlineSmall,),
+        content: Text('สิทธิ์การเข้าถึงตำแหน่งถูกปิด กรุณาเปิดการเข้าถึงตำแหน่งของแอพใน Settings.', style: Theme.of(context).textTheme.bodyMedium,),
+        actions: [
+          ElevatedButton(onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          }, child: Text('เข้าใจแล้ว', style: TextStyle(fontSize: 18.sp),))
+        ],
+      ));
       return;
     }
   }
@@ -695,8 +696,8 @@ class _CalibrateState extends State<Calibrate> {
       [long]
     ], dtype: DType.float64);
     var current_sp = opt!.toSP(current_gp);
-    log(current_sp.toString());
-    log(current_gp.toString());
+    // log(current_sp.toString());
+    // log(current_gp.toString());
     setState(() {
       myPosition = Offset(current_sp[0][0], current_sp[1][0]);
     });

@@ -307,12 +307,11 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> export2csv() async {
-    List<String> header = ['no.', 'name', 'activity', 'detail', 'date'];
+    List<String> header = ['ชื่อ', 'กิจกรรม', 'รายละเอียด', 'วันที่'];
     List<List<String>> data = [];
     List<ActivitiesModel> activitiesList = await ActivitiesDb().getActivities(widget.idMap);
     for (int i = 0; i < activitiesList.length; i++) {
       data.add([
-        (i+1).toString(), 
         activitiesList[i].tree!, 
         activitiesList[i].activity!,
         activitiesList[i].details!,

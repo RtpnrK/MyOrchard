@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,6 +23,7 @@ class _CreateActivityState extends State<CreateActivity> {
   File? selectedImage;
   TextEditingController treeController = TextEditingController();
   TextEditingController activityController = TextEditingController();
+  String activity = '';
   String plotSelected = '';
   TextEditingController detailController = TextEditingController();
   String date = DateFormat.yMd().format(DateTime.now());
@@ -45,13 +47,20 @@ class _CreateActivityState extends State<CreateActivity> {
         context: context,
         builder: (BuildContext context) {
           return Container(
-            height: 180.h,
-            color: Theme.of(context).colorScheme.surface,
+            height: 250.h,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(22.5),
+                    topRight: Radius.circular(22.5)
+            ),
+            color: Theme.of(context).colorScheme.surface,),
             child: Center(
               child: Column(
-                spacing: 20,
                 children: <Widget>[
-                  Text('เลือกรูปจาก', style: Theme.of(context).textTheme.labelLarge,),
+                  Text('เลือกรูปจาก', style: Theme.of(context).textTheme.headlineMedium,),
+                  SizedBox(
+                    height: 30.h,
+                  ),
                   SizedBox(
                     width: 280.w,
                     child: ElevatedButton.icon(
@@ -60,6 +69,9 @@ class _CreateActivityState extends State<CreateActivity> {
                       label: Text('เลือกรูปจากแกลเลอรี่', style: TextStyle(fontSize: 18.sp),),
                       onPressed: () => selectImageGallery(),
                     ),
+                  ),
+                  SizedBox(
+                    height: 10.h,
                   ),
                   SizedBox(
                     width: 280.w,
@@ -161,6 +173,7 @@ class _CreateActivityState extends State<CreateActivity> {
                 Card(
                   child: SizedBox(
                     width: 380.w,
+                    height: 340.h,
                     child: Padding(
                       padding: EdgeInsets.only(top: 15.h, bottom: 15.h),
                       child: Column(
@@ -285,7 +298,6 @@ class _CreateActivityState extends State<CreateActivity> {
                           ),
                           SizedBox(
                             width: 340.w,
-                            height: 240.h,
                             child: TextField(
                               keyboardType: TextInputType.multiline,
                               maxLines: null,

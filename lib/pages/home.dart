@@ -92,6 +92,46 @@ class _HomeState extends State<Home> {
                                           )
                                       ));
                             },
+                            onLongPress: () {
+                              showDialog(
+                                    context: context,
+                                    builder: (BuildContext) {
+                                      return AlertDialog(
+                                        title: Text(
+                                          'ยืนยันการลบโปรไฟล์',
+                                          style: TextStyle(
+                                              color: Colors.redAccent,
+                                              fontSize: 30.sp),
+                                        ),
+                                        content: Text(
+                                          'คุณต้องการลบโปรไฟล์นี้ใช่หรือไม่?',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall,
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('ยกเลิก')),
+                                          TextButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _carouselController.previousPage();
+                                                  context.read<MapProvider>().removeProfile(
+                                                      context
+                                                          .read<MapProvider>()
+                                                          .list_profiles[index]);
+                                                });
+                                                // Handle delete action
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('ยืนยัน'))
+                                        ],
+                                      );
+                                    });
+                            },
                             child: Column(
                               children: [
                                 Expanded(
@@ -128,26 +168,26 @@ class _HomeState extends State<Home> {
                             ),
                           ),
                         )),
-                        Positioned(
-                          top: 8.0,
-                          right: 8.0,
-                          child: IconButton(
-                              icon: Icon(
-                                Icons.cancel_sharp,
-                                color: Theme.of(context).colorScheme.error,
-                                size: 40.sp,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _carouselController.previousPage();
-                                  context.read<MapProvider>().removeProfile(
-                                      context
-                                          .read<MapProvider>()
-                                          .list_profiles[index]);
-                                });
-                                // Handle delete action
-                              }),
-                        ),
+                        // Positioned(
+                        //   top: 8.0,
+                        //   right: 8.0,
+                        //   child: IconButton(
+                        //       icon: Icon(
+                        //         Icons.cancel_sharp,
+                        //         color: Theme.of(context).colorScheme.error,
+                        //         size: 40.sp,
+                        //       ),
+                        //       onPressed: () {
+                        //         setState(() {
+                        //           _carouselController.previousPage();
+                        //           context.read<MapProvider>().removeProfile(
+                        //               context
+                        //                   .read<MapProvider>()
+                        //                   .list_profiles[index]);
+                        //         });
+                        //         // Handle delete action
+                        //       }),
+                        // ),
                       ],
                     ),
                   )

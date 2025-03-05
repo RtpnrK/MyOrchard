@@ -186,7 +186,7 @@ class _EditActivityState extends State<EditActivity> {
                                   decoration: InputDecoration(
                                     isDense: true,
                                     label: Text(
-                                      "กิจกรรม",
+                                      "ชื่อ",
                                       style: TextStyle(fontSize: 18.sp),
                                     ),
                                     filled: true,
@@ -236,7 +236,7 @@ class _EditActivityState extends State<EditActivity> {
                                   controller: treeController,
                                   decoration: InputDecoration(
                                     label: Text(
-                                      "ต้น",
+                                      "กิจกรรม",
                                       style: TextStyle(fontSize: 18.sp),
                                     ),
                                     filled: true,
