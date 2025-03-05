@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -67,7 +66,9 @@ class _CreateActivityState extends State<CreateActivity> {
                       icon: Icon(Icons.photo_size_select_actual_rounded, size: 30.sp,),
                       iconAlignment: IconAlignment.end,
                       label: Text('เลือกรูปจากแกลเลอรี่', style: TextStyle(fontSize: 18.sp),),
-                      onPressed: () => selectImageGallery(),
+                      onPressed: (){
+                        selectImageGallery();
+                        Navigator.pop(context);},
                     ),
                   ),
                   SizedBox(
