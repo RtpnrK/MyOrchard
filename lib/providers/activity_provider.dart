@@ -26,7 +26,7 @@ class ActivityProvider extends ChangeNotifier {
 
   // เพิ่มกิจกรรม
   Future<void> addActivity(
-      String? image, tree, details, activity, date, plot, int profileId) async {
+      String? image, tree, details, activity, date, plot, executor, int profileId) async {
     try {
       final newActivity = ActivitiesModel(
           image: image,
@@ -35,6 +35,7 @@ class ActivityProvider extends ChangeNotifier {
           activity: activity,
           plot: plot,
           date: date,
+          executor: executor,
           profileId: profileId);
 
       await ActivitiesDb().insertActivity(newActivity); // บันทึกลงฐานข้อมูล

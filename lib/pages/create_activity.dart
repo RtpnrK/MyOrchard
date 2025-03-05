@@ -24,6 +24,7 @@ class _CreateActivityState extends State<CreateActivity> {
   TextEditingController activityController = TextEditingController();
   String plotSelected = '';
   TextEditingController detailController = TextEditingController();
+  TextEditingController executorController = TextEditingController();
   String date = DateFormat.yMd().format(DateTime.now());
 
   Future<void> selectImageGallery() async {
@@ -325,6 +326,28 @@ class _CreateActivityState extends State<CreateActivity> {
                           ),
                           SizedBox(
                             width: 340.w,
+                            child: TextField(
+                              style: TextStyle(
+                                fontSize: 21.sp,
+                              ),
+                              textAlignVertical: TextAlignVertical.center,
+                              textAlign: TextAlign.start,
+                              controller: executorController,
+                              decoration: InputDecoration(
+                                label: Text(
+                                  "ผู้ปฏิบัติการ",
+                                  style: TextStyle(fontSize: 18.sp),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12.5),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 340.w,
                             height: 240.h,
                             child: TextField(
                               keyboardType: TextInputType.multiline,
@@ -385,20 +408,18 @@ class _CreateActivityState extends State<CreateActivity> {
               height: 58.h,
               child: FilledButton(
                 onPressed: () {
-                 
-                    context.read<ActivityProvider>().addActivity(
-                        selectedImage?.path ?? '',
-                        treeController.text,
-                        detailController.text,
-                        activityController.text,
-                        date,
-                        plotSelected,
-                        widget.idMap);
-                    context
-                        .read<ActivityProvider>()
-                        .loadActivities(widget.idMap);
-                    Navigator.pop(context);
-                  
+                  context.read<ActivityProvider>().addActivity(
+                      selectedImage?.path ?? '',
+                      treeController.text,
+                      detailController.text,
+                      activityController.text,
+                      date,
+                      plotSelected,
+                      executorController.text,
+                      widget.idMap,
+                      );
+                  context.read<ActivityProvider>().loadActivities(widget.idMap);
+                  Navigator.pop(context);
                 },
                 style: ButtonStyle(
                     shape: WidgetStatePropertyAll(RoundedRectangleBorder(

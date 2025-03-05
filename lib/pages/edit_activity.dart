@@ -25,6 +25,7 @@ class _EditActivityState extends State<EditActivity> {
   String plotSelected = '';
   late TextEditingController detailController;
   String date = "";
+  late TextEditingController executorController;
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _EditActivityState extends State<EditActivity> {
     treeController = TextEditingController(text: widget.activity.tree);
     activityController = TextEditingController(text: widget.activity.activity);
     detailController = TextEditingController(text: widget.activity.details);
+    executorController = TextEditingController(text: widget.activity.executor);
     plotSelected = widget.activity.plot!;
     date = widget.activity.date!;
     selectedImage = File(widget.activity.image!);
@@ -110,211 +112,239 @@ class _EditActivityState extends State<EditActivity> {
         ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-          child: Column(
-            children: [
-              Card(
-                elevation: 5,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(22.5))),
-                child: InkWell(
-                    borderRadius: BorderRadius.all(Radius.circular(22.5)),
-                    onTap: () => showOption(),
-                    child: selectedImage != null
-                        ? SizedBox(
-                            width: 380.w,
-                            height: 300.h,
-                            child: Ink(
+      body: SingleChildScrollView(
+        reverse:true,
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
+            child: Column(
+              spacing: 5.h,
+              children: [
+                Card(
+                  elevation: 5,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(22.5))),
+                  child: InkWell(
+                      borderRadius: BorderRadius.all(Radius.circular(22.5)),
+                      onTap: () => showOption(),
+                      child: selectedImage != null
+                          ? SizedBox(
+                              width: 380.w,
+                              height: 300.h,
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(22.5)),
+                                    image: DecorationImage(
+                                        image: FileImage(selectedImage!),
+                                        fit: BoxFit.cover)),
+                              ),
+                            )
+                          : Container(
+                              height: 300.h,
+                              width: 380.w,
                               decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.black26),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(22.5)),
-                                  image: DecorationImage(
-                                      image: FileImage(selectedImage!),
-                                      fit: BoxFit.cover)),
-                            ),
-                          )
-                        : Container(
-                            height: 300.h,
-                            width: 380.w,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black26),
-                              borderRadius: BorderRadius.circular(22.5),
-                            ),
-                            child: Ink(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.black26),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(22.5)),
-                                  image: DecorationImage(
-                                      image: widget.activity.image!.isEmpty
-                                          ? AssetImage('assets/images/noimage.png')
-                                          : FileImage(File(widget.activity.image!)),
-                                      fit: BoxFit.cover)),
-                            ),
-                          )),
-              ),
-              Card(
-                child: SizedBox(
-                  width: 380.w,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 15.h, bottom: 15.h),
-                    child: Column(
-                      spacing: 10.h,
-                      children: [
-                        Row(
-                          spacing: 10.w,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 195.w,
-                              height: 60.h,
-                              child: TextField(
-                                keyboardType: TextInputType.multiline,
-                                maxLines: null,
-                                style: TextStyle(
-                                  fontSize: 21.sp,
-                                ),
-                                textAlignVertical: TextAlignVertical.center,
-                                textAlign: TextAlign.start,
-                                controller: activityController,
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  label: Text(
-                                    "กิจกรรม",
-                                    style: TextStyle(fontSize: 18.sp),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(5.0),
-                                  ),
-                                ),
+                                border: Border.all(color: Colors.black26),
+                                borderRadius: BorderRadius.circular(22.5),
                               ),
-                            ),
-                            SizedBox(
-                              width: 135.w,
-                              height: 60.h,
-                              child: TextField(
-                                textAlign: TextAlign.center,
-                                textAlignVertical: TextAlignVertical.center,
-                                readOnly: true, // ทำให้ไม่สามารถแก้ไขได้
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(5.0),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                ),
-                                controller: TextEditingController(
-                                  text: date,
-                                ),
-                                style: TextStyle(fontSize: 20.sp),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black26),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(22.5)),
+                                    image: DecorationImage(
+                                        image: widget.activity.image!.isEmpty
+                                            ? AssetImage(
+                                                'assets/images/noimage.png')
+                                            : FileImage(
+                                                File(widget.activity.image!)),
+                                        fit: BoxFit.cover)),
                               ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          spacing: 10.w,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 140.w,
-                              height: 60.h,
-                              child: TextFormField(
-                                style: TextStyle(
-                                    fontSize: 21.sp,
-                                    overflow: TextOverflow.ellipsis),
-                                textAlignVertical: TextAlignVertical.center,
-                                textAlign: TextAlign.start,
-                                controller: treeController,
-                                decoration: InputDecoration(
-                                  label: Text(
-                                    "ต้น",
-                                    style: TextStyle(fontSize: 18.sp),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(5.0),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 190.w,
-                              height: 60.h,
-                              child: DropdownButtonFormField2(
-                                  value: plotSelected.isEmpty
-                                      ? null
-                                      : plotSelected, // ให้เลือกแปลงที่ไม่ซ้ำกัน
-                                  isExpanded: true,
+                            )),
+                ),
+                Card(
+                  child: SizedBox(
+                    width: 380.w,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 15.h, bottom: 15.h),
+                      child: Column(
+                        spacing: 10.h,
+                        children: [
+                          Row(
+                            spacing: 10.w,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 195.w,
+                                height: 60.h,
+                                child: TextField(
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: null,
                                   style: TextStyle(
-                                      fontSize: 20.sp,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w600),
+                                    fontSize: 21.sp,
+                                  ),
+                                  textAlignVertical: TextAlignVertical.center,
+                                  textAlign: TextAlign.start,
+                                  controller: activityController,
                                   decoration: InputDecoration(
-                                      // isDense: true,
-
-                                      label: Text(
-                                        "แปลง",
-                                        style: TextStyle(fontSize: 18.sp),
-                                      ),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(5.0))),
-                                  items: widget.plots!.map((plot) {
-                                    return DropdownMenuItem(
-                                      value: plot,
-                                      child: Text(plot.toString()),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      plotSelected = value as String;
-                                      print("value = $value");
-                                    });
-                                  }),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          width: 340.w,
-                          height: 240.h,
-                          child: TextField(
-                            keyboardType: TextInputType.multiline,
-                            maxLines: null,
-                            style: TextStyle(
-                              fontSize: 21.sp,
-                            ),
-                            textAlignVertical: TextAlignVertical.center,
-                            textAlign: TextAlign.start,
-                            controller: detailController,
-                            decoration: InputDecoration(
-                              label: Text(
-                                "รายละเอียด",
-                                style: TextStyle(fontSize: 18.sp),
+                                    isDense: true,
+                                    label: Text(
+                                      "กิจกรรม",
+                                      style: TextStyle(fontSize: 18.sp),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5.0),
+                              SizedBox(
+                                width: 135.w,
+                                height: 60.h,
+                                child: TextField(
+                                  textAlign: TextAlign.center,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  readOnly: true, // ทำให้ไม่สามารถแก้ไขได้
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                  ),
+                                  controller: TextEditingController(
+                                    text: date,
+                                  ),
+                                  style: TextStyle(fontSize: 20.sp),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            spacing: 10.w,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 140.w,
+                                height: 60.h,
+                                child: TextFormField(
+                                  style: TextStyle(
+                                      fontSize: 21.sp,
+                                      overflow: TextOverflow.ellipsis),
+                                  textAlignVertical: TextAlignVertical.center,
+                                  textAlign: TextAlign.start,
+                                  controller: treeController,
+                                  decoration: InputDecoration(
+                                    label: Text(
+                                      "ต้น",
+                                      style: TextStyle(fontSize: 18.sp),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 190.w,
+                                height: 60.h,
+                                child: DropdownButtonFormField2(
+                                    value: plotSelected.isEmpty
+                                        ? null
+                                        : plotSelected, // ให้เลือกแปลงที่ไม่ซ้ำกัน
+                                    isExpanded: true,
+                                    style: TextStyle(
+                                        fontSize: 20.sp,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600),
+                                    decoration: InputDecoration(
+                                        // isDense: true,
+        
+                                        label: Text(
+                                          "แปลง",
+                                          style: TextStyle(fontSize: 18.sp),
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5.0))),
+                                    items: widget.plots!.map((plot) {
+                                      return DropdownMenuItem(
+                                        value: plot,
+                                        child: Text(plot.toString()),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        plotSelected = value as String;
+                                        print("value = $value");
+                                      });
+                                    }),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            width: 340.w,
+                            child: TextField(
+                              style: TextStyle(
+                                fontSize: 21.sp,
+                              ),
+                              textAlignVertical: TextAlignVertical.center,
+                              textAlign: TextAlign.start,
+                              controller: executorController,
+                              decoration: InputDecoration(
+                                label: Text(
+                                  "ผู้ปฏิบัติการ",
+                                  style: TextStyle(fontSize: 18.sp),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                          SizedBox(
+                            width: 340.w,
+                            height: 240.h,
+                            child: TextField(
+                              keyboardType: TextInputType.multiline,
+                              maxLines: null,
+                              style: TextStyle(
+                                fontSize: 21.sp,
+                              ),
+                              textAlignVertical: TextAlignVertical.center,
+                              textAlign: TextAlign.start,
+                              controller: detailController,
+                              decoration: InputDecoration(
+                                label: Text(
+                                  "รายละเอียด",
+                                  style: TextStyle(fontSize: 18.sp),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -354,6 +384,7 @@ class _EditActivityState extends State<EditActivity> {
                           activity: activityController.text,
                           plot: plotSelected,
                           date: date,
+                          executor: executorController.text,
                           profileId: widget.activity.profileId));
 
                   Navigator.pop(context);

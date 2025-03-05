@@ -97,7 +97,7 @@ class _ActivitiesState extends State<Activities> {
                                           ),
                                         ),
                                         Text(
-                                          "กิจกรรม :${activity.activity} ",
+                                          "กิจกรรม : ${activity.activity} ",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodySmall,

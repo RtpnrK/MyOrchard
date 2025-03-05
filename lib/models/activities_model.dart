@@ -1,7 +1,7 @@
 class ActivitiesModel {
   int? id;
   int profileId;
-  String? tree, details, activity, plot, image, date;
+  String? tree, details, activity, plot, image, date, executor;
 
   ActivitiesModel(
       {this.id,
@@ -11,6 +11,7 @@ class ActivitiesModel {
       this.plot,
       this.image,
       this.date,
+      this.executor,
       required this.profileId});
 
   Map<String, dynamic> toMap() {
@@ -23,6 +24,7 @@ class ActivitiesModel {
       'image': image,
       'date': date,
       'plot': plot,
+      'executor': executor,
     };
   }
 
@@ -35,7 +37,8 @@ class ActivitiesModel {
       activity: map['activity'],
       image: map['image'],
       plot: map['plot'],
-      date: map['date']
+      date: map['date'],
+      executor:map['executor']
     );
   }
 }
