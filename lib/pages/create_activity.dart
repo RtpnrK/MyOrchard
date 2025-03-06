@@ -22,6 +22,7 @@ class _CreateActivityState extends State<CreateActivity> {
   File? selectedImage;
   TextEditingController treeController = TextEditingController();
   TextEditingController activityController = TextEditingController();
+  String activity = '';
   String plotSelected = '';
   TextEditingController detailController = TextEditingController();
   TextEditingController executorController = TextEditingController();
@@ -46,69 +47,41 @@ class _CreateActivityState extends State<CreateActivity> {
         context: context,
         builder: (BuildContext context) {
           return Container(
-            height: 180.h,
-            color: Theme.of(context).colorScheme.surface,
+            height: 250.h,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(22.5),
+                    topRight: Radius.circular(22.5)
+            ),
+            color: Theme.of(context).colorScheme.surface,),
             child: Center(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text(
-                    'เลือกรูปจาก',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: Colors.black, fontWeight: FontWeight.normal),
+                  Text('เลือกรูปจาก', style: Theme.of(context).textTheme.headlineMedium,),
+                  SizedBox(
+                    height: 30.h,
                   ),
-                  Divider(),
-                  InkWell(
-                      onTap: () {
+                  SizedBox(
+                    width: 280.w,
+                    child: ElevatedButton.icon(
+                      icon: Icon(Icons.photo_size_select_actual_rounded, size: 30.sp,),
+                      iconAlignment: IconAlignment.end,
+                      label: Text('เลือกรูปจากแกลเลอรี่', style: TextStyle(fontSize: 18.sp),),
+                      onPressed: (){
                         selectImageGallery();
-                        Navigator.pop(context);
-                      },
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          spacing: 8.w,
-                          children: [
-                            Text(
-                              "เลือกรูปจากแกลเลอรี่",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.copyWith(
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.normal),
-                            ),
-                            Icon(
-                              Icons.photo_size_select_actual_rounded,
-                              size: 24.sp,
-                              color: Colors.grey,
-                            )
-                          ])),
-                  Divider(),
-                  InkWell(
-                    onTap: () {
-                      selectImageCamera();
-                      Navigator.pop(context);
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 8.w,
-                      children: [
-                        Text(
-                          "ถ่ายภาพ",
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelLarge
-                              ?.copyWith(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.normal),
-                        ),
-                        Icon(
-                          Icons.camera_alt,
-                          size: 24.sp,
-                          color: Colors.grey,
-                        ),
-                      ],
+                        Navigator.pop(context);},
                     ),
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  SizedBox(
+                    width: 280.w,
+                    child: ElevatedButton.icon(
+                        onPressed: () => selectImageCamera(),
+                        icon: Icon(Icons.camera_alt_outlined, size: 30.sp,),
+                        iconAlignment: IconAlignment.end,
+                        label: Text("ถ่ายรูป", style: TextStyle(fontSize: 18.sp),)),
                   )
                 ],
               ),
@@ -202,6 +175,7 @@ class _CreateActivityState extends State<CreateActivity> {
                 Card(
                   child: SizedBox(
                     width: 380.w,
+                    height: 340.h,
                     child: Padding(
                       padding: EdgeInsets.only(top: 15.h, bottom: 15.h),
                       child: Column(
@@ -222,11 +196,11 @@ class _CreateActivityState extends State<CreateActivity> {
                                   ),
                                   textAlignVertical: TextAlignVertical.center,
                                   textAlign: TextAlign.start,
-                                  controller: activityController,
+                                  controller: treeController,
                                   decoration: InputDecoration(
                                     isDense: true,
                                     label: Text(
-                                      "กิจกรรม",
+                                      "ชื่อ",
                                       style: TextStyle(fontSize: 18.sp),
                                     ),
                                     filled: true,
@@ -265,7 +239,7 @@ class _CreateActivityState extends State<CreateActivity> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SizedBox(
-                                width: 140.w,
+                                width: 180.w,
                                 height: 60.h,
                                 child: TextFormField(
                                   style: TextStyle(
@@ -273,10 +247,10 @@ class _CreateActivityState extends State<CreateActivity> {
                                       overflow: TextOverflow.ellipsis),
                                   textAlignVertical: TextAlignVertical.center,
                                   textAlign: TextAlign.start,
-                                  controller: treeController,
+                                  controller: activityController,
                                   decoration: InputDecoration(
                                     label: Text(
-                                      "ต้น",
+                                      "กิจกรรม",
                                       style: TextStyle(fontSize: 18.sp),
                                     ),
                                     filled: true,
@@ -288,7 +262,7 @@ class _CreateActivityState extends State<CreateActivity> {
                                 ),
                               ),
                               SizedBox(
-                                width: 190.w,
+                                width: 150.w,
                                 height: 60.h,
                                 child: DropdownButtonFormField2(
                                     isExpanded: true,
@@ -393,13 +367,9 @@ class _CreateActivityState extends State<CreateActivity> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                style: ButtonStyle(
-                    shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)))),
-                    backgroundColor: WidgetStatePropertyAll(Colors.redAccent)),
                 child: Text(
                   'ยกเลิก',
-                  style: TextStyle(fontSize: 32),
+                  style: TextStyle(fontSize: 30.sp),
                 ),
               ),
             ),
@@ -421,13 +391,9 @@ class _CreateActivityState extends State<CreateActivity> {
                   context.read<ActivityProvider>().loadActivities(widget.idMap);
                   Navigator.pop(context);
                 },
-                style: ButtonStyle(
-                    shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)))),
-                    backgroundColor: WidgetStatePropertyAll(Colors.green)),
                 child: Text(
                   'ยืนยัน',
-                  style: TextStyle(fontSize: 32),
+                  style: TextStyle(fontSize: 30.sp),
                 ),
               ),
             )

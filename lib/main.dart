@@ -75,9 +75,14 @@ class MyApp extends StatelessWidget {
                       fontSize: 18.sp,
                       color: Colors.black),
                   bodyMedium: TextStyle(
-                    fontSize: 28.sp,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.w500,
-                    color: Color.fromRGBO(115, 111, 111, 1)
+                    color: Colors.black
+                  ),
+                  bodyLarge: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black
                   ),
                 ),
                 fontFamily: 'Mitr',
