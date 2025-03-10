@@ -27,7 +27,6 @@ class _CreateActivityState extends State<CreateActivity> {
   bool other = false;
   TextEditingController detailController = TextEditingController();
   TextEditingController executorController = TextEditingController();
-  TextEditingController executorController = TextEditingController();
   String date = DateFormat.yMd().format(DateTime.now());
 
   Future<void> selectImageGallery() async {
@@ -136,7 +135,6 @@ class _CreateActivityState extends State<CreateActivity> {
         child: Padding(
           padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
           child: SingleChildScrollView(
-            reverse: true,
             child: Column(
               children: [
                 Card(
@@ -193,7 +191,7 @@ class _CreateActivityState extends State<CreateActivity> {
                 Card(
                   child: SizedBox(
                     width: 380.w,
-                    height: 340.h,
+                    
                     child: Padding(
                       padding: EdgeInsets.only(top: 15.h, bottom: 15.h),
                       child: Column(
@@ -224,7 +222,8 @@ class _CreateActivityState extends State<CreateActivity> {
                                     filled: true,
                                     fillColor: Colors.white,
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.5),
+                                      borderRadius:
+                                          BorderRadius.circular(12.5),
                                     ),
                                   ),
                                 ),
@@ -239,7 +238,8 @@ class _CreateActivityState extends State<CreateActivity> {
                                   decoration: InputDecoration(
                                     isDense: true,
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.5),
+                                      borderRadius:
+                                          BorderRadius.circular(12.5),
                                     ),
                                     filled: true,
                                     fillColor: Colors.white,
@@ -274,7 +274,8 @@ class _CreateActivityState extends State<CreateActivity> {
                                     filled: true,
                                     fillColor: Colors.white,
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.5),
+                                      borderRadius:
+                                          BorderRadius.circular(12.5),
                                     ),
                                   ),
                                 ),
@@ -367,55 +368,57 @@ class _CreateActivityState extends State<CreateActivity> {
                       ),
                     ),
                   ),
-                )
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 10.h, top: 10.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        width: 180.w,
+                        height: 58.h,
+                        child: FilledButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'ยกเลิก',
+                            style: TextStyle(fontSize: 30.sp),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 180.w,
+                        height: 58.h,
+                        child: FilledButton(
+                          onPressed: () {
+                            context.read<ActivityProvider>().addActivity(
+                                  selectedImage?.path ?? '',
+                                  treeController.text,
+                                  detailController.text,
+                                  activityController.text,
+                                  date,
+                                  plotSelected,
+                                  executorController.text,
+                                  widget.idMap,
+                                );
+                            context
+                                .read<ActivityProvider>()
+                                .loadActivities(widget.idMap);
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'ยืนยัน',
+                            style: TextStyle(fontSize: 30.sp),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(bottom: 10.h),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            SizedBox(
-              width: 180.w,
-              height: 58.h,
-              child: FilledButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'ยกเลิก',
-                  style: TextStyle(fontSize: 30.sp),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 180.w,
-              height: 58.h,
-              child: FilledButton(
-                onPressed: () {
-                  context.read<ActivityProvider>().addActivity(
-                      selectedImage?.path ?? '',
-                      treeController.text,
-                      detailController.text,
-                      activityController.text,
-                      date,
-                      plotSelected,
-                      executorController.text,
-                      widget.idMap,
-                      );
-                  context.read<ActivityProvider>().loadActivities(widget.idMap);
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'ยืนยัน',
-                  style: TextStyle(fontSize: 30.sp),
-                ),
-              ),
-            )
-          ],
         ),
       ),
     );
