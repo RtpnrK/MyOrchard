@@ -40,11 +40,11 @@ class _ActivityDetailState extends State<ActivityDetail> {
           SizedBox(
             width: width,
             height: height * 0.36,
-            child: widget.activity.image != null ? Image.file(
+            child: widget.activity.image!.isNotEmpty ? Image.file(
               File(widget.activity.image!),
               fit: BoxFit.cover,
             ) : Image.asset(
-              'assets/images/noimage.png',
+              'assets/images/no_image.jpg',
               fit: BoxFit.cover,
             ),
           ),
@@ -148,44 +148,10 @@ class _ActivityDetailState extends State<ActivityDetail> {
                             height: 70.h,
                             child: FilledButton(
                               onPressed: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (BuildContext) {
-                                      return AlertDialog(
-                                        title: Text(
-                                          'ยืนยันการลบกิจกรรม',
-                                          style: TextStyle(
-                                              color: Colors.redAccent,
-                                              fontSize: 30.sp),
-                                        ),
-                                        content: Text(
-                                          'คุณต้องการลบกิจกรรมนี้ใช่หรือไม่?',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall,
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: Text('ยกเลิก')),
-                                          TextButton(
-                                              onPressed: () {
-                                                context
-                                                    .read<ActivityProvider>()
-                                                    .removeActivity(
-                                                        updatedActivity);
-                                                Navigator.pop(context);
-                                                Navigator.pop(context, true);
-                                              },
-                                              child: Text('ยืนยัน'))
-                                        ],
-                                      );
-                                    });
+                                Navigator.pop(context);
                               },
                               child: Text(
-                                'ลบ',
+                                'ย้อนกลับ',
                                 style: TextStyle(fontSize: 28.sp),
                               ),
                             ),
@@ -216,22 +182,7 @@ class _ActivityDetailState extends State<ActivityDetail> {
                 ),
               ),
             ),
-          ),
-          Positioned(
-              top: 35,
-              left: 10,
-              child: IconButton.filled(
-                style: IconButton.styleFrom(
-                  shape: const CircleBorder(),
-                  backgroundColor: Colors.white,
-                ),
-                onPressed: (){
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back_ios,
-                color: Theme.of(context).colorScheme.secondary,
-                size: 30.sp,)
-              ))
+          )
         ],
       ),
     );

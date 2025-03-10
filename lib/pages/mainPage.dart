@@ -155,17 +155,27 @@ class _MainPageState extends State<MainPage> {
     ];
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
         leading: Padding(
           padding: EdgeInsets.only(top: 12.h, left: 10.w),
-          child: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              size: 40.h,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
+          child: PopScope(
+            canPop: false,
+            onPopInvokedWithResult:(didPop, result) {
+              if (didPop) {
+                return;
+              }
+              backDialog(context);
             },
+            child: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios,
+                size: 40.h,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+              onPressed: () {
+                backDialog(context);
+              },
+            ),
           ),
         ),
         backgroundColor: Colors.white,
@@ -306,6 +316,42 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  void backDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(
+              'กลับสู่หน้าเลือกโปรไฟล์ใช่หรือไม่?',
+              style: TextStyle(fontSize: 20.sp),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'ยกเลิก',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontSize: 20.sp),
+                  )),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'ยืนยัน',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontSize: 20.sp),
+                  ))
+            ],
+          );
+        });
+  }
+
   Future<void> export2csv() async {
     List<String> header = ['ชื่อ', 'กิจกรรม', 'รายละเอียด', 'วันที่'];
     List<List<String>> data = [];
@@ -317,6 +363,7 @@ class _MainPageState extends State<MainPage> {
         activitiesList[i].details!,
         activitiesList[i].date!]);
     }
+    data.reversed;
     data.insert(0, header);
     String csv = ListToCsvConverter().convert(data);
     Uint8List csvBytes = utf8.encode(csv); 

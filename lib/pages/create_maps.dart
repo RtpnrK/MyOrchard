@@ -143,176 +143,185 @@ class _CreateMapsState extends State<CreateMaps> {
                             ? 360.h
                             : null,
                         width: 380.w,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20.h),
-                              child: SizedBox(
-                                height: 60.h,
-                                child: TextField(
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  style: TextStyle(fontSize: 21.sp),
-                                  controller: mapNameController,
-                                  decoration: InputDecoration(
-                                    isDense: true,
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    label: Text('ชื่อสวน',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 20.w, top: 10.h, bottom: 8.h),
+                                  child: Text(
+                                    'ชื่อสวน',
+                                    style: Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20.h),
+                                child: SizedBox(
+                                  height: 60.h,
+                                  child: TextField(
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: null,
+                                    style: TextStyle(fontSize: 21.sp),
+                                    controller: mapNameController,
+                                    decoration: InputDecoration(
+                                      isDense: true,
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                                      label: Text('ตั้งชื่อสวนของคุณ',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall?.copyWith(color: Colors.grey)),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10.0),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                    left: 20.w, top: 10.h, bottom: 8.h),
-                                child: Text(
-                                  'แปลง',
-                                  style: Theme.of(context).textTheme.bodySmall,
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 20.w, top: 10.h, bottom: 8.h),
+                                  child: Text(
+                                    'แปลง',
+                                    style: Theme.of(context).textTheme.bodySmall,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Center(
-                              child: ListView.builder(
-                                  physics: NeverScrollableScrollPhysics(),
-                                  padding: EdgeInsets.only(
-                                      left: 20.w, right: 20.w, bottom: 8.h),
-                                  shrinkWrap: true,
-                                  itemCount: listPlotController.length,
-                                  itemBuilder: (context, index) {
-                                    return Stack(
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.symmetric(
-                                              vertical: 10.h),
-                                          height: 60.h,
-                                          child: TextField(
-                                            style: TextStyle(fontSize: 21.sp),
-                                            controller:
-                                                listPlotController[index],
-                                            decoration: InputDecoration(
-                                                filled: true,
-                                                fillColor: Colors.white,
-                                                label: Text(
-                                                  "แปลงที่ ${index + 1}",
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall,
-                                                ),
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                                suffixIcon: IconButton(
-                                                    onPressed: () =>
-                                                        removePlot(index),
-                                                    icon: Icon(
-                                                      Icons.remove,
-                                                      size: 30.sp,
-                                                    ))),
+                              Center(
+                                child: ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    padding: EdgeInsets.only(
+                                        left: 20.w, right: 20.w, bottom: 8.h),
+                                    shrinkWrap: true,
+                                    itemCount: listPlotController.length,
+                                    itemBuilder: (context, index) {
+                                      return Stack(
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 10.h),
+                                            height: 60.h,
+                                            child: TextField(
+                                              style: TextStyle(fontSize: 21.sp),
+                                              controller:
+                                                  listPlotController[index],
+                                              decoration: InputDecoration(
+                                                floatingLabelBehavior: FloatingLabelBehavior.never,
+                                                  filled: true,
+                                                  fillColor: Colors.white,
+                                                  label: Text(
+                                                    "แปลงที่ ${index + 1}",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .displaySmall,
+                                                  ),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                  ),
+                                                  suffixIcon: IconButton(
+                                                      onPressed: () =>
+                                                          removePlot(index),
+                                                      icon: Icon(
+                                                        Icons.remove,
+                                                        size: 30.sp,
+                                                      ))),
+                                            ),
                                           ),
+                                        ],
+                                      );
+                                    }),
+                              ),
+                              InkWell(
+                                  splashColor: Colors.transparent,
+                                  onTap: () {
+                                    setState(() {
+                                      listPlotController
+                                          .add(TextEditingController());
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 25.w),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.add,
+                                          size: 30.sp,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
                                         ),
+                                        Text(
+                                          'เพิ่มแปลง',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displaySmall
+                                              ?.copyWith(color: Colors.black),
+                                        )
                                       ],
-                                    );
-                                  }),
-                            ),
-                            InkWell(
-                                splashColor: Colors.transparent,
-                                onTap: () {
-                                  setState(() {
-                                    listPlotController
-                                        .add(TextEditingController());
-                                  });
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.only(left: 25.w),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.add,
-                                        size: 30.sp,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                      ),
-                                      Text(
-                                        'เพิ่มแปลง',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displaySmall
-                                            ?.copyWith(color: Colors.grey),
-                                      )
-                                    ],
-                                  ),
-                                )),
-                            SizedBox(
-                              height: 20.h,
-                            )
-                          ],
+                                    ),
+                                  )),
+                              SizedBox(
+                                height: 20.h,
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 10.h),
-                    child: SizedBox(
-                      height: 60.h,
-                      width: 380.w,
-                      child: ElevatedButton.icon(
-                        iconAlignment: IconAlignment.start,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () {
-                          if (mapNameController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: const Text("กรุณากรอกชื่อสวน"),
-                            ));
-                            return;
-                          }
-
-                          context.read<MapProvider>().addProfile(
-                              selectedImage?.path ?? '',
-                              mapNameController.text,
-                              listPlotController
-                                  .map((listPlot) => listPlot.text)
-                                  .toList());
-                          Navigator.pop(context);
-                        },
-                        label: Text(
-                          'ยืนยัน',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.surface,
-                              ),
-                        ),
-                        icon: Icon(
-                          Icons.create,
-                          size: 28.sp,
-                        ),
-                      ),
-                    ),
-                  )
                 ],
               ),
             ),
           ),
-        ));
+        ),
+        bottomNavigationBar: Padding(
+        padding: EdgeInsets.only(bottom: 10.h, right: 20.w, left: 20.w),
+        child: SizedBox(
+          height: 60.h,
+          width: 380.w,
+          child: ElevatedButton.icon(
+            iconAlignment: IconAlignment.start,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () {
+              if (mapNameController.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: const Text("กรุณากรอกชื่อสวน"),
+                ));
+                return;
+              }
+
+              context.read<MapProvider>().addProfile(
+                  selectedImage?.path ?? '',
+                  mapNameController.text,
+                  listPlotController.map((listPlot) => listPlot.text).toList());
+              Navigator.pop(context);
+            },
+            label: Text(
+              'ยืนยัน',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+            ),
+            icon: Icon(
+              Icons.create,
+              size: 28.sp,
+            ),
+          ),
+        ),
+      ),);
   }
 }
