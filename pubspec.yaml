@@ -75,7 +75,6 @@ flutter:
   assets:
     # Image
     - assets/images/.
-   
     # Logo Icon
     - assets/logo/Logo.png
     # Assets Icon

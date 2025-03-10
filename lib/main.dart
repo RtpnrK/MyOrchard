@@ -35,6 +35,9 @@ class MyApp extends StatelessWidget {
         // Use builder only if you need to use library outside ScreenUtilInit context
         builder: (_, child) {
           return MaterialApp(
+            scrollBehavior: ScrollBehavior().copyWith(
+              physics: BouncingScrollPhysics()
+            ),
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
                 useMaterial3: true,

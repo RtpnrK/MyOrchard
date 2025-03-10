@@ -7,6 +7,7 @@ class PinM {
   double longitude;
   double offsetX;
   double offsetY;
+  double accuracy;
   String color;
 
   PinM({
@@ -17,6 +18,7 @@ class PinM {
     required this.offsetX,
     required this.offsetY,
     required this.color,
+    required this.accuracy,
   });
 
   // Convert a Pin into a Map. The keys must correspond to the names of the columns in the database.
@@ -29,6 +31,7 @@ class PinM {
       'offsetX': offsetX,
       'offsetY': offsetY,
       'color': color,
+      'accuracy': accuracy,
     };
   }
 
@@ -42,6 +45,7 @@ class PinM {
       offsetX: map['offsetX'],
       offsetY: map['offsetY'],
       color: map['color'],
+      accuracy: map['accuracy'],
     );
   }
 }

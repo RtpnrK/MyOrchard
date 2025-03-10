@@ -24,7 +24,7 @@ class PinsProvider extends ChangeNotifier {
 
   // เพิ่มกิจกรรม
   Future<void> addPin(int profileId, double latitude, double longitude,
-      double offsetX, double offsetY, String color) async {
+      double offsetX, double offsetY, String color, double accuracy) async {
     try {
       final newPins = PinM(
         profileId: profileId,
@@ -33,6 +33,7 @@ class PinsProvider extends ChangeNotifier {
         offsetX: offsetX,
         offsetY: offsetY,
         color: color,
+        accuracy: accuracy
       );
 
       await PinsDb().insertPin(newPins); // บันทึกลงฐานข้อมูล

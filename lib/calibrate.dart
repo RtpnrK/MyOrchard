@@ -61,7 +61,7 @@ class _CalibrateState extends State<Calibrate> {
             longitude: p.longitude,
             latitude: p.latitude,
             timestamp: DateTime.now(),
-            accuracy: 0,
+            accuracy: p.accuracy,
             altitude: 0,
             altitudeAccuracy: 0,
             heading: 0,
@@ -125,7 +125,8 @@ class _CalibrateState extends State<Calibrate> {
                       e.position.longitude,
                       e.pinOffset.dx,
                       e.pinOffset.dy,
-                      e.pinColor.toHexString());
+                      e.pinColor.toHexString(),
+                      e.position.accuracy);
                 }
 
                 debugPrint("Add Pins : ${pinList.length}");
@@ -202,12 +203,13 @@ class _CalibrateState extends State<Calibrate> {
                   backgroundColor: Theme.of(context).colorScheme.secondary),
               onPressed: pinList.length >= 3
                   ? () {
+                      updateDistance();
                       double errAvg = 0;
                       List<double> errList = [];
-                      pinList.forEach((Pin p) {
+                      for (var p in pinList) {
                         errAvg += p.position.accuracy;
                         errList.add(p.position.accuracy);
-                      });
+                      }
                       double errMax = errList.reduce(max);
                       errAvg /= pinList.length;
                       showDialog(
@@ -550,7 +552,6 @@ class _CalibrateState extends State<Calibrate> {
                               await _loadingState();
                               pinList[index].addPosition(position);
                               setState(() {
-                                updateDistance();
                                 index++;
                                 isPin = false;
                               });
@@ -682,6 +683,7 @@ class _CalibrateState extends State<Calibrate> {
         });
     await _getCurrentLocation();
     while(position.accuracy > 15) {
+      // print('Accuracy: ${position.accuracy}');
       await _getCurrentLocation();
     }
     if (mounted) {
@@ -716,18 +718,17 @@ class _CalibrateState extends State<Calibrate> {
   }
 
   void updateDistance() {
-    if (pinList.length > 1) {
-      int end = pinList.length - 1;
-      int start = pinList.length - 2;
-      double d = Geolocator.distanceBetween(
-          pinList[start].position.latitude,
-          pinList[start].position.longitude,
-          pinList[end].position.latitude,
-          pinList[end].position.longitude);
-      totalDistance += d;
-    } else {
-      return;
+    double distance = 0;
+    for (int i = 0; i < pinList.length - 1; i++) {
+      totalDistance += Geolocator.distanceBetween(
+          pinList[i].position.latitude,
+          pinList[i].position.longitude,
+          pinList[i + 1].position.latitude,
+          pinList[i + 1].position.longitude);
     }
+    setState(() {
+      totalDistance = distance;
+    });
   }
 }
 

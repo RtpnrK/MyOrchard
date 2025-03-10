@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:myorchard/models/pinModel.dart';
-
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -30,8 +29,9 @@ class PinsDb {
     String path = join(documentsDirectory.path, "testPins.db");
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade
     );
   }
 
@@ -46,9 +46,16 @@ class PinsDb {
         offsetX REAL NOT NULL,
         offsetY REAL NOT NULL,
         color TEXT NOT NULL,
+        accuracy REAL NOT NULL,
         FOREIGN KEY (profileId) REFERENCES testProfile(id)
       )
     ''');
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE testPins ADD COLUMN accuracy REAL NOT NULL DEFAULT 0');
+    }
   }
 
   // Insert a new pin

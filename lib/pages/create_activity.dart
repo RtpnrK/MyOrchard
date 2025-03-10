@@ -24,7 +24,9 @@ class _CreateActivityState extends State<CreateActivity> {
   TextEditingController activityController = TextEditingController();
   String activity = '';
   String plotSelected = '';
+  bool other = false;
   TextEditingController detailController = TextEditingController();
+  TextEditingController executorController = TextEditingController();
   TextEditingController executorController = TextEditingController();
   String date = DateFormat.yMd().format(DateTime.now());
 
@@ -49,27 +51,37 @@ class _CreateActivityState extends State<CreateActivity> {
           return Container(
             height: 250.h,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(22.5),
-                    topRight: Radius.circular(22.5)
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(22.5),
+                  topRight: Radius.circular(22.5)),
+              color: Theme.of(context).colorScheme.surface,
             ),
-            color: Theme.of(context).colorScheme.surface,),
             child: Center(
               child: Column(
                 children: <Widget>[
-                  Text('เลือกรูปจาก', style: Theme.of(context).textTheme.headlineMedium,),
+                  Text(
+                    'เลือกรูปจาก',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
                   SizedBox(
                     height: 30.h,
                   ),
                   SizedBox(
                     width: 280.w,
                     child: ElevatedButton.icon(
-                      icon: Icon(Icons.photo_size_select_actual_rounded, size: 30.sp,),
+                      icon: Icon(
+                        Icons.photo_size_select_actual_rounded,
+                        size: 30.sp,
+                      ),
                       iconAlignment: IconAlignment.end,
-                      label: Text('เลือกรูปจากแกลเลอรี่', style: TextStyle(fontSize: 18.sp),),
-                      onPressed: (){
+                      label: Text(
+                        'เลือกรูปจากแกลเลอรี่',
+                        style: TextStyle(fontSize: 18.sp),
+                      ),
+                      onPressed: () {
                         selectImageGallery();
-                        Navigator.pop(context);},
+                        Navigator.pop(context);
+                      },
                     ),
                   ),
                   SizedBox(
@@ -79,9 +91,15 @@ class _CreateActivityState extends State<CreateActivity> {
                     width: 280.w,
                     child: ElevatedButton.icon(
                         onPressed: () => selectImageCamera(),
-                        icon: Icon(Icons.camera_alt_outlined, size: 30.sp,),
+                        icon: Icon(
+                          Icons.camera_alt_outlined,
+                          size: 30.sp,
+                        ),
                         iconAlignment: IconAlignment.end,
-                        label: Text("ถ่ายรูป", style: TextStyle(fontSize: 18.sp),)),
+                        label: Text(
+                          "ถ่ายรูป",
+                          style: TextStyle(fontSize: 18.sp),
+                        )),
                   )
                 ],
               ),

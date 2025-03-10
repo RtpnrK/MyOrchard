@@ -36,7 +36,9 @@ class _EditActivityState extends State<EditActivity> {
     executorController = TextEditingController(text: widget.activity.executor);
     plotSelected = widget.activity.plot!;
     date = widget.activity.date!;
-    selectedImage = File(widget.activity.image!);
+    if (widget.activity.image!.isNotEmpty){
+     selectedImage = File(widget.activity.image!);
+    }
   }
 
   Future<void> selectImageGallery() async {
@@ -60,29 +62,57 @@ class _EditActivityState extends State<EditActivity> {
         context: context,
         builder: (BuildContext context) {
           return Container(
-            height: 180.h,
-            color: Theme.of(context).colorScheme.surface,
+            height: 250.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(22.5),
+                  topRight: Radius.circular(22.5)),
+              color: Theme.of(context).colorScheme.surface,
+            ),
             child: Center(
               child: Column(
-                spacing: 20,
                 children: <Widget>[
-                  Text('เลือกรูปจาก', style: Theme.of(context).textTheme.labelLarge,),
+                  Text(
+                    'เลือกรูปจาก',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  SizedBox(
+                    height: 30.h,
+                  ),
                   SizedBox(
                     width: 280.w,
                     child: ElevatedButton.icon(
-                      icon: Icon(Icons.photo_size_select_actual_rounded, size: 30.sp,),
+                      icon: Icon(
+                        Icons.photo_size_select_actual_rounded,
+                        size: 30.sp,
+                      ),
                       iconAlignment: IconAlignment.end,
-                      label: Text('เลือกรูปจากแกลเลอรี่', style: TextStyle(fontSize: 18.sp),),
-                      onPressed: () => selectImageGallery(),
+                      label: Text(
+                        'เลือกรูปจากแกลเลอรี่',
+                        style: TextStyle(fontSize: 18.sp),
+                      ),
+                      onPressed: () {
+                        selectImageGallery();
+                        Navigator.pop(context);
+                      },
                     ),
+                  ),
+                  SizedBox(
+                    height: 10.h,
                   ),
                   SizedBox(
                     width: 280.w,
                     child: ElevatedButton.icon(
                         onPressed: () => selectImageCamera(),
-                        icon: Icon(Icons.camera_alt_outlined, size: 30.sp,),
+                        icon: Icon(
+                          Icons.camera_alt_outlined,
+                          size: 30.sp,
+                        ),
                         iconAlignment: IconAlignment.end,
-                        label: Text("ถ่ายรูป", style: TextStyle(fontSize: 18.sp),)),
+                        label: Text(
+                          "ถ่ายรูป",
+                          style: TextStyle(fontSize: 18.sp),
+                        )),
                   )
                 ],
               ),
@@ -129,11 +159,12 @@ class _EditActivityState extends State<EditActivity> {
                   child: InkWell(
                       borderRadius: BorderRadius.all(Radius.circular(22.5)),
                       onTap: () => showOption(),
-                      child: selectedImage != null
-                          ? SizedBox(
+                      child: SizedBox(
                               width: 380.w,
                               height: 300.h,
-                              child: Ink(
+                              child: widget.activity.image!.isNotEmpty
+                          ?
+                              Ink(
                                 decoration: BoxDecoration(
                                     border: Border.all(color: Colors.black26),
                                     borderRadius:
@@ -141,16 +172,8 @@ class _EditActivityState extends State<EditActivity> {
                                     image: DecorationImage(
                                         image: FileImage(selectedImage!),
                                         fit: BoxFit.cover)),
-                              ),
-                            )
-                          : Container(
-                              height: 300.h,
-                              width: 380.w,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black26),
-                                borderRadius: BorderRadius.circular(22.5),
-                              ),
-                              child: Ink(
+                              )
+                          :   Ink(
                                 decoration: BoxDecoration(
                                     border: Border.all(color: Colors.black26),
                                     borderRadius:

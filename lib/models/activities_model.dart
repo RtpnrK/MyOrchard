@@ -1,4 +1,5 @@
 class ActivitiesModel {
+  bool isSelected;
   int? id;
   int profileId;
   String? tree, details, activity, plot, image, date, executor;
@@ -12,6 +13,7 @@ class ActivitiesModel {
       this.image,
       this.date,
       this.executor,
+      this.isSelected = false,
       required this.profileId});
 
   Map<String, dynamic> toMap() {
