@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:math';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -36,12 +37,14 @@ class _CalibrateState extends State<Calibrate> {
   Color pickerColor = Colors.transparent;
   List<Pin> pinList = [];
   int index = 0;
+  int accuracy = 25;
   String message = '';
   Offset myPosition = Offset.zero;
   late double lat;
   late double long;
   Optimize? opt;
   late Position position;
+  Position? newPosition;
   StreamSubscription<Position>? positionStreamSubscription;
   late LocationPermission permission;
 
@@ -100,7 +103,7 @@ class _CalibrateState extends State<Calibrate> {
         ),
         backgroundColor: Colors.white,
         title: Text(
-          'ปรับเทียบ',
+          'ระบุตำแหน่ง',
           style: Theme.of(context).textTheme.headlineLarge,
         ),
         actions: [
@@ -215,7 +218,7 @@ class _CalibrateState extends State<Calibrate> {
                       showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                                title: Text('Calibrate',
+                                title: Text('ปรับเทียบ',
                                     textAlign: TextAlign.center,
                                     style: Theme.of(context)
                                         .textTheme
@@ -261,14 +264,14 @@ class _CalibrateState extends State<Calibrate> {
                                 actions: [
                                   ElevatedButton(
                                     onPressed: () async {
-                                      await _calibrate();
+                                      await _calibrate(context);
                                       _startLocationUpdates();
                                       setState(() {
                                         isCalibrate = true;
                                         Navigator.of(context).pop();
                                       });
                                     },
-                                    child: Text('Start Calibrate'),
+                                    child: Text('เริ่มการปรับเทียบ'),
                                   ),
                                 ],
                               ));
@@ -281,7 +284,7 @@ class _CalibrateState extends State<Calibrate> {
                       )));
                     },
               label: Text(
-                'Calibrate',
+                'ปรับเทียบ',
                 style: TextStyle(fontSize: 16.sp),
               ),
               icon: ImageIcon(
@@ -357,7 +360,7 @@ class _CalibrateState extends State<Calibrate> {
                                                                 .start,
                                                         children: [
                                                           Text(
-                                                            'Pixel Offset: ${pinList[idx].pinOffset.toString()}',
+                                                            'Pixel Offset: (${pinList[idx].pinOffset.dx.toStringAsFixed(1)}, ${pinList[idx].pinOffset.dy.toStringAsFixed(1)})',
                                                             style: Theme.of(
                                                                     context)
                                                                 .textTheme
@@ -407,49 +410,127 @@ class _CalibrateState extends State<Calibrate> {
               onPressed: () {
                 double size = pinSize;
                 bool mode = advanceMode;
+                int setAccuracy = 0;
                 showDialog(
                     context: context,
                     builder: (context) =>
                         StatefulBuilder(builder: (context, setDialogState) {
                           return AlertDialog(
                             title: Text(
-                              'ขนาด Pin',
+                              'ตั้งค่า',
                               style: Theme.of(context).textTheme.headlineMedium,
                               textAlign: TextAlign.center,
                             ),
                             content: SizedBox(
-                              height: 100.h,
+                              height: 300.h,
                               width: double.maxFinite,
                               child: Column(
+                                spacing: 20.h,
                                 mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     spacing: 15.w,
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      IconButton(
-                                          onPressed: () {
-                                            setDialogState(() {
-                                              size -= 5;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            Icons.remove_circle, 
-                                            color: Theme.of(context).primaryColor,
-                                            size: 40.sp,)),
-                                      Text('$size', style: TextStyle(fontSize: 20.sp),),
-                                      IconButton(
-                                          onPressed: () {
-                                            setDialogState(() {
-                                              size += 5;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            Icons.add_circle, 
-                                            color: Theme.of(context).primaryColor,
-                                            size: 40.sp,)),
+                                      Text('ขนาด Pin', style: Theme.of(context).textTheme.bodyLarge,),
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                              onPressed: () {
+                                                setDialogState(() {
+                                                  size -= 5;
+                                                });
+                                              },
+                                              icon: Icon(
+                                                Icons.remove_circle,
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                size: 30.sp,
+                                              )),
+                                          Text(
+                                            '$size',
+                                            style: TextStyle(fontSize: 20.sp),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                setDialogState(() {
+                                                  size += 5;
+                                                });
+                                              },
+                                              icon: Icon(
+                                                Icons.add_circle,
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                size: 30.sp,
+                                              )),
+                                        ],
+                                      )
                                     ],
                                   ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'ความแม่นยำ',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge,
+                                      ),
+                                      SizedBox(
+                                        width: 130.w,
+                                        child: DropdownButtonFormField2(
+                                          value: accuracy,
+                                          style: TextStyle(
+                                              fontSize: 20.sp,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w600),
+                                          decoration: InputDecoration(
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          12.5))),
+                                          items: [
+                                            DropdownMenuItem(
+                                              value: 0,
+                                              child: Text(
+                                                'ต่ำ', style: TextStyle(fontSize: 16.sp),
+                                              ),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: 25,
+                                              child: Text('กลาง',
+                                                  style: TextStyle(
+                                                      fontSize: 16.sp)),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: 20,
+                                              child: Text('สูง',
+                                                  style: TextStyle(
+                                                      fontSize: 16.sp)),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: 15,
+                                              child: Text('สูงสุด',
+                                                  style: TextStyle(
+                                                      fontSize: 16.sp)),
+                                            ),
+                                          ],
+                                          onChanged: (value) {
+                                            setAccuracy = value!;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Center(
+                                    child: Text(
+                                      '(ความแม่นยำสูงอาจใช้เวลานาน)',
+                                      style:
+                                          Theme.of(context).textTheme.bodyMedium,
+                                    ),
+                                  ),
+                                  
                                 ],
                               ),
                             ),
@@ -465,6 +546,7 @@ class _CalibrateState extends State<Calibrate> {
                                     setState(() {
                                       pinSize = size;
                                       advanceMode = mode;
+                                      accuracy = setAccuracy;
                                     });
                                     Navigator.of(context).pop();
                                   },
@@ -549,7 +631,7 @@ class _CalibrateState extends State<Calibrate> {
                     ElevatedButton.icon(
                       onPressed: pinList.length != index
                           ? () async {
-                              await _loadingState();
+                              await _loadingState(context);
                               pinList[index].addPosition(position);
                               setState(() {
                                 index++;
@@ -602,7 +684,7 @@ class _CalibrateState extends State<Calibrate> {
     });
   }
 
-  Future<void> _calibrate() async {
+  Future<void> _calibrate(context) async {
     List<List<double>> l1 = [[], []];
     List<List<double>> l2 = [[], []];
     pinList.forEach((Pin p) {
@@ -615,7 +697,7 @@ class _CalibrateState extends State<Calibrate> {
     var SP = Matrix.fromList(l2, dtype: DType.float64);
     opt = Optimize(GP, SP);
     opt!.solve();
-    await _loadingState();
+    await _loadingState(context);
     var current_gp = Matrix.fromList([
       [lat],
       [long]
@@ -674,19 +756,28 @@ class _CalibrateState extends State<Calibrate> {
     });
   }
 
-  Future<void> _loadingState() async {
+  Future<void> _loadingState(context) async {
     showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) {
-          return const Center(child: CircularProgressIndicator());
+          return StatefulBuilder(
+            builder: (BuildContext context, setDialogState) => AlertDialog(
+              title: Text('กรุณารอสักครู่...'),
+            ),
+          );
         });
     await _getCurrentLocation();
-    while(position.accuracy > 15) {
-      // print('Accuracy: ${position.accuracy}');
+    if (accuracy != 0) {
+    while(position.accuracy > accuracy) {
+      setState(() {
+        newPosition = position;
+      });
+      print(newPosition!.accuracy);
       await _getCurrentLocation();
-    }
+    }}
     if (mounted) {
+      newPosition = null;
       Navigator.of(context).pop();
     }
   }

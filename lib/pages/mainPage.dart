@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'dart:math';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
@@ -87,13 +88,16 @@ class _MainPageState extends State<MainPage> {
                             profileId: widget.idMap,
                           )));
             },
-            label: Text('ปรับเทียบ'),
+            label: Text('ระบุตำแหน่ง'),
             iconAlignment: IconAlignment.end,
-            icon: ImageIcon(
-              AssetImage('assets/icons/calibrate.png'),
-              size: 30.sp,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+            // icon: ImageIcon(
+            //   AssetImage('assets/icons/calibrate.png'),
+            //   size: 30.sp,
+            //   color: Theme.of(context).colorScheme.primary,
+            // ),
+            icon: Transform.rotate(
+              angle: 45*(pi/180),
+              child: Icon(Icons.navigation)),
           ),
         )
       ],

@@ -22,75 +22,74 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.only(top: 10.h),
-        child: Column(
-            children: [
-              Card(
-                child: Container(
-                  height: 300.h,
-                  width: 380.w,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(22.5)),
-                      image: DecorationImage(
-                          image: FileImage(widget.image), fit: BoxFit.cover)),
-                ),
-              ),
-              Card(
+    return SizedBox(
+      height: 680.h,
+      child: Center(
+        child: Padding(
+          padding: EdgeInsets.only(top: 10.h),
+          child: SingleChildScrollView(
+            child: Column(
+              spacing: 10.h,
+              children: [
+                Card(
                   child: Container(
-                width: 380.w,
-                height: 365.h,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(22.5),
+                    height: 300.h,
+                    width: 380.w,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(22.5)),
+                        image: DecorationImage(
+                            image: FileImage(widget.image), fit: BoxFit.cover)),
                   ),
                 ),
-                child: Padding(
-                  padding: EdgeInsets.only(top: 20.h, left: 25.w),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "ชื่อ : ",
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          widget.name.isEmpty
-                              ? Text("ไม่ได้ใส่ข้อมูล")
-                              : Text(
-                                  widget.name,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                )
-                        ],
-                      ),
-                      Row(
+                Card(
+                    child: Container(
+                  width: 380.w,
+                  height: 320.h,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(22.5),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 20.h, left: 25.w),
+                    child: SingleChildScrollView(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Row(
+                            children: [
+                              Text(
+                                "ชื่อ : ",
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                              widget.name.isEmpty
+                                  ? Text("ไม่ได้ใส่ข้อมูล", style: Theme.of(context).textTheme.bodyLarge,)
+                                  : Text(
+                                      widget.name,
+                                      style: Theme.of(context).textTheme.bodyLarge,
+                                    )
+                            ],
+                          ),
                           Text(
                             "แปลง : ",
-                            style: Theme.of(context).textTheme.bodyMedium,
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
-                          Expanded(
-                            child: SizedBox(
-                              height: 235.h,
-                              child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: widget.plots!.length,
-                                  itemBuilder: (context, index) {
-                                    return Text(widget.plots![index]);
-                                  }),
-                            ),
-                          )
+                          ...List.generate(widget.plots!.length, (index){
+                                return Padding(
+                                  padding: EdgeInsets.only(left: 30.w),
+                                  child: Text('- ${widget.plots![index]}', style: Theme.of(context).textTheme.bodyLarge,),
+                                );
+                              })
                         ],
-                      )
-                    ],
+                      ),
+                    ),
                   ),
-                ),
-              ))
-            ],
+                )),
+              ],
+            ),
           ),
+        ),
       ),
     );
   }

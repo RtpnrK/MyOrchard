@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:myorchard/pickImage.dart';
 import 'package:myorchard/providers/activity_provider.dart';
+import 'package:myorchard/providers/map_provider.dart';
 import 'package:provider/provider.dart';
 
 class CreateActivity extends StatefulWidget {
@@ -23,6 +24,7 @@ class _CreateActivityState extends State<CreateActivity> {
   TextEditingController treeController = TextEditingController();
   TextEditingController activityController = TextEditingController();
   String activity = '';
+  int activityNo = 0;
   String plotSelected = '';
   bool other = false;
   TextEditingController detailController = TextEditingController();
@@ -109,6 +111,7 @@ class _CreateActivityState extends State<CreateActivity> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> activitySet = context.watch<MapProvider>().list_profiles[widget.idMap-1].activitiesSet!;
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
@@ -197,185 +200,110 @@ class _CreateActivityState extends State<CreateActivity> {
                       padding: EdgeInsets.only(top: 15.h, bottom: 15.h),
                       child: SingleChildScrollView(
                         child: Column(
-                          spacing: 10.h,
+                          spacing: 20.h,
                           children: [
-                            Row(
-                              spacing: 10.w,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 195.w,
-                                  height: 60.h,
-                                  child: TextField(
-                                    keyboardType: TextInputType.multiline,
-                                    maxLines: null,
-                                    style: TextStyle(
-                                      fontSize: 21.sp,
-                                    ),
-                                    textAlignVertical: TextAlignVertical.center,
-                                    textAlign: TextAlign.start,
-                                    controller: treeController,
-                                    decoration: InputDecoration(
-                                      isDense: true,
-                                      label: Text(
-                                        "ชื่อ",
-                                        style: TextStyle(fontSize: 18.sp),
-                                      ),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.5),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 135.w,
-                                  height: 60.h,
-                                  child: TextField(
-                                    textAlign: TextAlign.center,
-                                    textAlignVertical: TextAlignVertical.center,
-                                    readOnly: true, // ทำให้ไม่สามารถแก้ไขได้
-                                    decoration: InputDecoration(
-                                      isDense: true,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.5),
-                                      ),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                    ),
-                                    controller: TextEditingController(
-                                      text: date,
-                                    ),
-                                    style: TextStyle(fontSize: 20.sp),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              spacing: 10.w,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 180.w,
-                                  height: 60.h,
-                                  child: TextFormField(
-                                    style: TextStyle(
-                                        fontSize: 21.sp,
-                                        overflow: TextOverflow.ellipsis),
-                                    textAlignVertical: TextAlignVertical.center,
-                                    textAlign: TextAlign.start,
-                                    controller: activityController,
-                                    decoration: InputDecoration(
-                                      label: Text(
-                                        "กิจกรรม",
-                                        style: TextStyle(fontSize: 18.sp),
-                                      ),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.5),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 150.w,
-                                  height: 60.h,
-                                  child: DropdownButtonFormField2(
-                                      isExpanded: true,
+                            Padding(
+                              padding: EdgeInsets.only(top: 15.h),
+                              child: Row(
+                                spacing: 10.w,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 195.w,
+                                    height: 60.h,
+                                    child: TextField(
+                                      keyboardType: TextInputType.multiline,
+                                      maxLines: null,
                                       style: TextStyle(
-                                          fontSize: 20.sp,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600),
+                                        fontSize: 21.sp,
+                                      ),
+                                      textAlignVertical: TextAlignVertical.center,
+                                      textAlign: TextAlign.start,
+                                      controller: treeController,
                                       decoration: InputDecoration(
-                                          // isDense: true,
-                                          label: Text(
-                                            widget.plots!.isEmpty
-                                                ? "ไม่มีแปลง"
-                                                : "แปลง",
-                                            style: TextStyle(fontSize: 18.sp),
-                                          ),
-                                          filled: true,
-                                          fillColor: Colors.white,
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12.5))),
-                                      items: widget.plots!.map((plot) {
-                                        return DropdownMenuItem(
-                                          value: plot,
-                                          child: Text(plot.toString()),
-                                        );
-                                      }).toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          print("value = $value");
-                                          plotSelected = value as String;
-                                        });
-                                      }),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              width: 340.w,
-                              child: TextField(
-                                keyboardType: TextInputType.multiline,
-                                maxLines: null,
-                                style: TextStyle(
-                                  fontSize: 21.sp,
-                                ),
-                                textAlignVertical: TextAlignVertical.center,
-                                textAlign: TextAlign.start,
-                                controller: detailController,
-                                decoration: InputDecoration(
-                                  label: Text(
-                                    "รายละเอียด",
-                                    style: TextStyle(fontSize: 18.sp),
+                                        floatingLabelBehavior:
+                                            FloatingLabelBehavior.always,
+                                        isDense: true,
+                                        label: Text(
+                                          "ชื่อ",
+                                          style: TextStyle(fontSize: 24.sp),
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12.5),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12.5),
+                                  SizedBox(
+                                    width: 135.w,
+                                    height: 60.h,
+                                    child: TextField(
+                                      textAlign: TextAlign.center,
+                                      textAlignVertical: TextAlignVertical.center,
+                                      readOnly: true, // ทำให้ไม่สามารถแก้ไขได้
+                                      decoration: InputDecoration(
+                                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                                        isDense: true,
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12.5),
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                      ),
+                                      controller: TextEditingController(
+                                        text: date,
+                                      ),
+                                      style: TextStyle(fontSize: 20.sp),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                             SizedBox(
-                              width: 300.w,
+                              width: 340.w,
                               height: 60.h,
                               child: DropdownButtonFormField2(
-                                  isExpanded: true,
-                                  style: TextStyle(
-                                      fontSize: 20.sp,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w600),
-                                  decoration: InputDecoration(
-                                      // isDense: true,
-                                      label: Text("กิจกรรม",
-                                        style: TextStyle(fontSize: 18.sp),
-                                      ),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12.5))),
-                                  items: [
-                                    DropdownMenuItem(child: Text('อื่นๆ(ระบุ)',), value: 0,),
-                                    DropdownMenuItem(child: Text('ใส่ปุ๋ย'), value: 1,),
-                                    DropdownMenuItem(child: Text('พรวนดิน'), value: 2,)
-                                  ],
-                                  onChanged: (value){
-                                    if(value == 0) {
-                                      setState(() {
-                                        other = true;
-                                      });
-                                    } else {
-                                      setState(() {
-                                        other = false;
-                                      });
-                                    }
-                                  },
-                                  ),
+                                
+                                isExpanded: true,
+                                style: TextStyle(
+                                    fontSize: 20.sp,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600),
+                                decoration: InputDecoration(
+                                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                                    // isDense: true,
+                                    label: Text(
+                                      "กิจกรรม",
+                                      style: TextStyle(fontSize: 24.sp),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.5))),
+                                items: List.generate(activitySet.length,
+                                         (index) => DropdownMenuItem(
+                                          child: Text(activitySet[index], style: Theme.of(context).textTheme.bodySmall,),
+                                          value: index,)),
+                                onChanged: (value) {
+                                  setState(() {
+                                    activity = activitySet[value!];
+                                  });
+                                  if (value == 0) {
+                                    setState(() {
+                                      other = true;
+                                    });
+                                  } else {
+                                    setState(() {
+                                      other = false;
+                                    });
+                                  }
+                                },
+                              ),
                             ),
                             Visibility(
                               visible: other,
@@ -387,11 +315,13 @@ class _CreateActivityState extends State<CreateActivity> {
                                   ),
                                   textAlignVertical: TextAlignVertical.center,
                                   textAlign: TextAlign.start,
-                                  controller: executorController,
+                                  controller: activityController,
                                   decoration: InputDecoration(
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
                                     label: Text(
-                                      "ผู้ปฎิบัติการ",
-                                      style: TextStyle(fontSize: 18.sp),
+                                      "ระบุกิจกรรม",
+                                      style: TextStyle(fontSize: 24.sp),
                                     ),
                                     filled: true,
                                     fillColor: Colors.white,
@@ -402,6 +332,89 @@ class _CreateActivityState extends State<CreateActivity> {
                                 ),
                               ),
                             ),
+                            SizedBox(
+                              width: 340.w,
+                              height: 100.h,
+                              child: TextField(
+                                expands: true,
+                                keyboardType: TextInputType.multiline,
+                                maxLines: null,
+                                style: TextStyle(
+                                  fontSize: 21.sp,
+                                ),
+                                textAlignVertical: TextAlignVertical.center,
+                                textAlign: TextAlign.start,
+                                controller: detailController,
+                                decoration: InputDecoration(
+                                  label: Text(
+                                    "รายละเอียด",
+                                  ),
+                                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                                  floatingLabelStyle: TextStyle(fontSize: 24.sp),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12.5),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 340.w,
+                              height: 60.h,
+                              child: DropdownButtonFormField2(
+                                  isExpanded: true,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                  decoration: InputDecoration(
+                                      // isDense: true,
+                                      label: Text(
+                                        widget.plots!.isEmpty
+                                            ? "ไม่มีแปลง"
+                                            : "แปลง",
+                                        style: TextStyle(fontSize: 18.sp),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12.5))),
+                                  items: widget.plots!.map((plot) {
+                                    return DropdownMenuItem(
+                                      value: plot,
+                                      child: Text(plot.toString()),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      print("value = $value");
+                                      plotSelected = value as String;
+                                    });
+                                  }),
+                            ),
+                            SizedBox(
+                              width: 340.w,
+                              height: 60.h,
+                              child: TextField(
+                                style: TextStyle(
+                                  fontSize: 21.sp,
+                                ),
+                                textAlignVertical: TextAlignVertical.center,
+                                textAlign: TextAlign.start,
+                                controller: executorController,
+                                decoration: InputDecoration(
+                                  label: Text(
+                                    "ผู้ปฎิบัติการ",
+                                    style: TextStyle(fontSize: 18.sp),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(12.5),
+                                  ),
+                                ),
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -436,11 +449,16 @@ class _CreateActivityState extends State<CreateActivity> {
               height: 58.h,
               child: FilledButton(
                 onPressed: () {
+                  if (other) {
+                    setState(() {
+                      activity = activityController.text;
+                    });
+                  }
                   context.read<ActivityProvider>().addActivity(
                       selectedImage?.path ?? '',
                       treeController.text,
                       detailController.text,
-                      activityController.text,
+                      activity,
                       date,
                       plotSelected,
                       widget.idMap);
