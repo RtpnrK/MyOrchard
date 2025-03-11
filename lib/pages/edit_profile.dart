@@ -121,7 +121,10 @@ class _EditProfileState extends State<EditProfile> {
                             )),
                 ),
                 Card(
-                  child: SizedBox(
+                  child: Container(
+                    constraints: BoxConstraints(
+                      minHeight: 345.h, // กำหนดความสูงขั้นต่ำ 100
+                    ),
                     width: 380.w,
                     child: Column(
                       spacing: 10.h,
@@ -129,7 +132,8 @@ class _EditProfileState extends State<EditProfile> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Padding(
-                            padding: EdgeInsets.only(left: 28.w, bottom: 10.h, top: 20.h),
+                            padding: EdgeInsets.only(
+                                left: 28.w, bottom: 10.h, top: 20.h),
                             child: Text(
                               'ชื่อสวน',
                               style: Theme.of(context).textTheme.labelLarge,
@@ -228,58 +232,55 @@ class _EditProfileState extends State<EditProfile> {
                                 ],
                               ),
                             )),
-                        SizedBox(
-                          height: 20.h,
-                        )
                       ],
                     ),
                   ),
-                )
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 10.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        width: 180.w,
+                        height: 58.h,
+                        child: FilledButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'ยกเลิก',
+                            style: TextStyle(fontSize: 25.sp),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 180.w,
+                        height: 58.h,
+                        child: FilledButton(
+                          onPressed: () {
+                            List<String> plotList = listPlotController
+                                .map((controller) => controller.text)
+                                .toList();
+                            context.read<MapProvider>().updateProfile(MapsModel(
+                                image: selectedImage!.path,
+                                name: mapNameController.text,
+                                id: widget.idMap,
+                                plots: plotList));
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'ยืนยัน',
+                            style: TextStyle(fontSize: 25.sp),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(bottom: 10.h),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            SizedBox(
-              width: 180.w,
-              height: 58.h,
-              child: FilledButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'ยกเลิก',
-                  style: TextStyle(fontSize: 25.sp),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 180.w,
-              height: 58.h,
-              child: FilledButton(
-                onPressed: () {
-                  List<String> plotList = listPlotController
-                      .map((controller) => controller.text)
-                      .toList();
-                  context.read<MapProvider>().updateProfile(MapsModel(
-                      image: selectedImage!.path,
-                      name: mapNameController.text,
-                      id: widget.idMap,
-                      plots: plotList));
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'ยืนยัน',
-                  style: TextStyle(fontSize: 25.sp),
-                ),
-              ),
-            )
-          ],
         ),
       ),
     );

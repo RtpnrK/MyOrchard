@@ -127,6 +127,22 @@ class _ActivityDetailState extends State<ActivityDetail> {
                             children: [
                               Expanded(
                                 child: Text(
+                                    'ผู้ปฏิบัติการ : ${updatedActivity.executor} ',
+                                    style: TextStyle(
+                                        fontSize: 30.sp,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w400)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: width,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
                                     'รายละเอียด : ${updatedActivity.details} ',
                                     style: TextStyle(
                                         fontSize: 30.sp,

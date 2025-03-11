@@ -25,6 +25,7 @@ class _EditActivityState extends State<EditActivity> {
   String plotSelected = '';
   late TextEditingController detailController;
   String date = "";
+  late TextEditingController executorController;
 
   @override
   void initState() {
@@ -32,10 +33,11 @@ class _EditActivityState extends State<EditActivity> {
     treeController = TextEditingController(text: widget.activity.tree);
     activityController = TextEditingController(text: widget.activity.activity);
     detailController = TextEditingController(text: widget.activity.details);
+    executorController = TextEditingController(text: widget.activity.executor);
     plotSelected = widget.activity.plot!;
     date = widget.activity.date!;
-    if (widget.activity.image!.isNotEmpty){
-     selectedImage = File(widget.activity.image!);
+    if (widget.activity.image!.isNotEmpty) {
+      selectedImage = File(widget.activity.image!);
     }
   }
 
@@ -56,68 +58,68 @@ class _EditActivityState extends State<EditActivity> {
   @override
   Widget build(BuildContext context) {
     void showOption() {
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-            height: 250.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(22.5),
-                  topRight: Radius.circular(22.5)),
-              color: Theme.of(context).colorScheme.surface,
-            ),
-            child: Center(
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    'เลือกรูปจาก',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  SizedBox(
-                    height: 30.h,
-                  ),
-                  SizedBox(
-                    width: 280.w,
-                    child: ElevatedButton.icon(
-                      icon: Icon(
-                        Icons.photo_size_select_actual_rounded,
-                        size: 30.sp,
-                      ),
-                      iconAlignment: IconAlignment.end,
-                      label: Text(
-                        'เลือกรูปจากแกลเลอรี่',
-                        style: TextStyle(fontSize: 18.sp),
-                      ),
-                      onPressed: () {
-                        selectImageGallery();
-                        Navigator.pop(context);
-                      },
+      showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              height: 250.h,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(22.5),
+                    topRight: Radius.circular(22.5)),
+                color: Theme.of(context).colorScheme.surface,
+              ),
+              child: Center(
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      'เลือกรูปจาก',
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  SizedBox(
-                    width: 280.w,
-                    child: ElevatedButton.icon(
-                        onPressed: () => selectImageCamera(),
+                    SizedBox(
+                      height: 30.h,
+                    ),
+                    SizedBox(
+                      width: 280.w,
+                      child: ElevatedButton.icon(
                         icon: Icon(
-                          Icons.camera_alt_outlined,
+                          Icons.photo_size_select_actual_rounded,
                           size: 30.sp,
                         ),
                         iconAlignment: IconAlignment.end,
                         label: Text(
-                          "ถ่ายรูป",
+                          'เลือกรูปจากแกลเลอรี่',
                           style: TextStyle(fontSize: 18.sp),
-                        )),
-                  )
-                ],
+                        ),
+                        onPressed: () {
+                          selectImageGallery();
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    SizedBox(
+                      width: 280.w,
+                      child: ElevatedButton.icon(
+                          onPressed: () => selectImageCamera(),
+                          icon: Icon(
+                            Icons.camera_alt_outlined,
+                            size: 30.sp,
+                          ),
+                          iconAlignment: IconAlignment.end,
+                          label: Text(
+                            "ถ่ายรูป",
+                            style: TextStyle(fontSize: 18.sp),
+                          )),
+                    )
+                  ],
+                ),
               ),
-            ),
-          );
-        });
-  }
+            );
+          });
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -141,11 +143,13 @@ class _EditActivityState extends State<EditActivity> {
         ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-          child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
             child: Column(
+              spacing: 5.h,
               children: [
                 Card(
                   elevation: 5,
@@ -156,11 +160,10 @@ class _EditActivityState extends State<EditActivity> {
                       borderRadius: BorderRadius.all(Radius.circular(22.5)),
                       onTap: () => showOption(),
                       child: SizedBox(
-                              width: 380.w,
-                              height: 300.h,
-                              child: widget.activity.image!.isNotEmpty
-                          ?
-                              Ink(
+                        width: 380.w,
+                        height: 300.h,
+                        child: widget.activity.image!.isNotEmpty
+                            ? Ink(
                                 decoration: BoxDecoration(
                                     border: Border.all(color: Colors.black26),
                                     borderRadius:
@@ -169,34 +172,20 @@ class _EditActivityState extends State<EditActivity> {
                                         image: FileImage(selectedImage!),
                                         fit: BoxFit.cover)),
                               )
-                          :   Ink(
+                            : Ink(
                                 decoration: BoxDecoration(
                                     border: Border.all(color: Colors.black26),
                                     borderRadius:
-                                        BorderRadius.all(Radius.circular(22.5)),),
-                                child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.file_upload_sharp,
-                                    size: 50.h,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  Text('เลือกรูปภาพ',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelLarge
-                                          ?.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                          )),
-                                ],
+                                        BorderRadius.all(Radius.circular(22.5)),
+                                    image: DecorationImage(
+                                        image: widget.activity.image!.isEmpty
+                                            ? AssetImage(
+                                                'assets/images/noimage.png')
+                                            : FileImage(
+                                                File(widget.activity.image!)),
+                                        fit: BoxFit.cover)),
                               ),
-                          ),
-                            )
-                            ),
+                      )),
                 ),
                 Card(
                   child: SizedBox(
@@ -225,7 +214,7 @@ class _EditActivityState extends State<EditActivity> {
                                   decoration: InputDecoration(
                                     isDense: true,
                                     label: Text(
-                                      "ชื่อ",
+                                      "กิจกรรม",
                                       style: TextStyle(fontSize: 18.sp),
                                     ),
                                     filled: true,
@@ -275,7 +264,7 @@ class _EditActivityState extends State<EditActivity> {
                                   controller: treeController,
                                   decoration: InputDecoration(
                                     label: Text(
-                                      "กิจกรรม",
+                                      "ต้น",
                                       style: TextStyle(fontSize: 18.sp),
                                     ),
                                     filled: true,
@@ -300,7 +289,7 @@ class _EditActivityState extends State<EditActivity> {
                                         fontWeight: FontWeight.w600),
                                     decoration: InputDecoration(
                                         // isDense: true,
-            
+
                                         label: Text(
                                           "แปลง",
                                           style: TextStyle(fontSize: 18.sp),
@@ -324,6 +313,28 @@ class _EditActivityState extends State<EditActivity> {
                                     }),
                               ),
                             ],
+                          ),
+                          SizedBox(
+                            width: 340.w,
+                            child: TextField(
+                              style: TextStyle(
+                                fontSize: 21.sp,
+                              ),
+                              textAlignVertical: TextAlignVertical.center,
+                              textAlign: TextAlign.start,
+                              controller: executorController,
+                              decoration: InputDecoration(
+                                label: Text(
+                                  "ผู้ปฏิบัติการ",
+                                  style: TextStyle(fontSize: 18.sp),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                              ),
+                            ),
                           ),
                           SizedBox(
                             width: 340.w,
@@ -354,55 +365,56 @@ class _EditActivityState extends State<EditActivity> {
                       ),
                     ),
                   ),
-                )
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 16.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        width: 180.w,
+                        height: 58.h,
+                        child: FilledButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'ยกเลิก',
+                            style: TextStyle(fontSize: 28.sp),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 180.w,
+                        height: 58.h,
+                        child: FilledButton(
+                          onPressed: () {
+                            context.read<ActivityProvider>().updateActivity(
+                                ActivitiesModel(
+                                    id: widget.activity.id,
+                                    image: selectedImage!.path,
+                                    tree: treeController.text,
+                                    details: detailController.text,
+                                    activity: activityController.text,
+                                    plot: plotSelected,
+                                    date: date,
+                                    executor: executorController.text,
+                                    profileId: widget.activity.profileId));
+
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'ยืนยัน',
+                            style: TextStyle(fontSize: 28.sp),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(bottom: 10.h),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            SizedBox(
-              width: 180.w,
-              height: 58.h,
-              child: FilledButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'ยกเลิก',
-                  style: TextStyle(fontSize: 28.sp),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 180.w,
-              height: 58.h,
-              child: FilledButton(
-                onPressed: () {
-                  context.read<ActivityProvider>().updateActivity(
-                      ActivitiesModel(
-                          id: widget.activity.id,
-                          image: selectedImage!.path,
-                          tree: treeController.text,
-                          details: detailController.text,
-                          activity: activityController.text,
-                          plot: plotSelected,
-                          date: date,
-                          profileId: widget.activity.profileId));
-
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'ยืนยัน',
-                  style: TextStyle(fontSize: 28.sp),
-                ),
-              ),
-            )
-          ],
         ),
       ),
     );

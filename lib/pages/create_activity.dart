@@ -138,7 +138,6 @@ class _CreateActivityState extends State<CreateActivity> {
         child: Padding(
           padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
           child: SingleChildScrollView(
-            reverse: true,
             child: Column(
               children: [
                 Card(
@@ -195,7 +194,7 @@ class _CreateActivityState extends State<CreateActivity> {
                 Card(
                   child: SizedBox(
                     width: 380.w,
-                    height: 340.h,
+                    
                     child: Padding(
                       padding: EdgeInsets.only(top: 15.h, bottom: 15.h),
                       child: SingleChildScrollView(
