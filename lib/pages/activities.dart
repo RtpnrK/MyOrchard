@@ -85,7 +85,7 @@ class _ActivitiesState extends State<Activities> {
                             title: Text(
                               'ยืนยันการลบกิจกรรม',
                               style: TextStyle(
-                                  color: Colors.redAccent, fontSize: 30.sp),
+                                  color: Colors.redAccent, fontSize: 25.sp),
                             ),
                             content: Text(
                               'คุณต้องการลบกิจกรรมนี้ใช่หรือไม่?',
@@ -110,11 +110,6 @@ class _ActivitiesState extends State<Activities> {
                                     });
                                     
                                     Navigator.pop(context);
-                                    // context
-                                    //     .read<ActivityProvider>()
-                                    //     .removeActivity(updatedActivity);
-                                    // Navigator.pop(context);
-                                    // Navigator.pop(context, true);
                                   },
                                   child: Text('ยืนยัน'))
                             ],

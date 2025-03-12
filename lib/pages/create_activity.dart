@@ -272,7 +272,6 @@ class _CreateActivityState extends State<CreateActivity> {
                               width: 340.w,
                               height: 60.h,
                               child: DropdownButtonFormField2(
-                                
                                 isExpanded: true,
                                 style: TextStyle(
                                     fontSize: 20.sp,
@@ -458,6 +457,15 @@ class _CreateActivityState extends State<CreateActivity> {
                     setState(() {
                       activity = '(อื่นๆ) ${activityController.text}';
                     });
+                  }
+                  if (activity.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        content: Text('กรุณาระบุกิจกรรม', style: TextStyle(fontSize: 16.sp),), 
+                        duration: Duration(seconds: 1),),
+                    );
+                    return;
                   }
                   context.read<ActivityProvider>().addActivity(
                       selectedImage?.path ?? '',

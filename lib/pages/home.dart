@@ -101,7 +101,7 @@ class _HomeState extends State<Home> {
                                           'ยืนยันการลบโปรไฟล์',
                                           style: TextStyle(
                                               color: Colors.redAccent,
-                                              fontSize: 30.sp),
+                                              fontSize: 25.sp),
                                         ),
                                         content: Text(
                                           'คุณต้องการลบโปรไฟล์นี้ใช่หรือไม่?',
