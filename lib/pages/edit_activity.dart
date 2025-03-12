@@ -61,7 +61,16 @@ class _EditActivityState extends State<EditActivity> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> activitySet = ['อื่นๆ(ระบุ)', 'ใส่ปุ๋ย', 'รดน้ำ', 'ใส่ยา', 'พรวนดิน', 'ตัดหญ้า'];
+    List<String> activitySet = [
+      'ใส่ปุ๋ย',
+      'รดน้ำ',
+      'ใส่ยา',
+      'ตัดหญ้า',
+      'โยงกิ่ง',
+      'แต่งดอก',
+      'แต่งลูก',
+      'อื่นๆ(ระบุ)',
+    ];
     bool inSet = false;
     for (var a in activitySet) {
       if(activity == a){

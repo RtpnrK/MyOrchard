@@ -555,33 +555,37 @@ class _ChatState extends State<Chat> {
                                   size: 24.sp,
                                 )))
                       ]),
-                IconButton(
-                  icon: Icon(
-                    Icons.send,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 34.sp,
+                Padding(
+                  padding: EdgeInsets.only(
+                      bottom: ScreenUtil().scaleHeight < 1 ? 6.h : 0),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.send,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 34.sp,
+                    ),
+                    onPressed: (_messageController.text.isNotEmpty ||
+                            selectedImage != null)
+                        ? () {
+                            print("image : ${selectedImage} ");
+                            context.read<ChatsProvider>().addChat(ChatModel(
+                                  message: selectedImage == null
+                                      ? _messageController.text
+                                      : selectedImage!.path,
+                                  time: DateFormat.Hms().format(DateTime.now()),
+                                  date: DateFormat.yMd().format(DateTime.now()),
+                                  profileId: widget.profileId,
+                                ));
+                            setState(() {
+                              _messageController.clear();
+                              selectedImage = null;
+                              double bottom =
+                                  _scrollController.position.maxScrollExtent;
+                              _scrollController.jumpTo(bottom);
+                            });
+                          }
+                        : () {},
                   ),
-                  onPressed: (_messageController.text.isNotEmpty ||
-                          selectedImage != null)
-                      ? () {
-                          print("image : ${selectedImage} ");
-                          context.read<ChatsProvider>().addChat(ChatModel(
-                                message: selectedImage == null
-                                    ? _messageController.text
-                                    : selectedImage!.path,
-                                time: DateFormat.Hms().format(DateTime.now()),
-                                date: DateFormat.yMd().format(DateTime.now()),
-                                profileId: widget.profileId,
-                              ));
-                          setState(() {
-                            _messageController.clear();
-                            selectedImage = null;
-                            double bottom =
-                                _scrollController.position.maxScrollExtent;
-                            _scrollController.jumpTo(bottom);
-                          });
-                        }
-                      : () {},
                 ),
               ],
             ),

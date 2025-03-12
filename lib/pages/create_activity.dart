@@ -112,12 +112,14 @@ class _CreateActivityState extends State<CreateActivity> {
   @override
   Widget build(BuildContext context) {
     List<String> activitySet = [
-      'อื่นๆ(ระบุ)',
       'ใส่ปุ๋ย',
       'รดน้ำ',
       'ใส่ยา',
-      'พรวนดิน',
-      'ตัดหญ้า'
+      'ตัดหญ้า',
+      'โยงกิ่ง',
+      'แต่งดอก',
+      'แต่งลูก',
+      'อื่นๆ(ระบุ)',
     ];
     return Scaffold(
       appBar: AppBar(
