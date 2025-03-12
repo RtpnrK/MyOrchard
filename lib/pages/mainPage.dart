@@ -88,16 +88,13 @@ class _MainPageState extends State<MainPage> {
                             profileId: widget.idMap,
                           )));
             },
-            label: Text('ระบุตำแหน่ง'),
+            label: Text('ปรับเทียบ'),
             iconAlignment: IconAlignment.end,
-            // icon: ImageIcon(
-            //   AssetImage('assets/icons/calibrate.png'),
-            //   size: 30.sp,
-            //   color: Theme.of(context).colorScheme.primary,
-            // ),
-            icon: Transform.rotate(
-              angle: 45*(pi/180),
-              child: Icon(Icons.navigation)),
+            icon: ImageIcon(
+              AssetImage('assets/icons/calibrate.png'),
+              size: 30.sp,
+              color: Theme.of(context).colorScheme.primary,
+            ), 
           ),
         )
       ],

@@ -280,51 +280,48 @@ class _CreateMapsState extends State<CreateMaps> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding:
-                      EdgeInsets.only(bottom: 10.h, right: 20.w, left: 20.w),
-                  child: SizedBox(
-                    height: 60.h,
-                    width: 380.w,
-                    child: ElevatedButton.icon(
-                      iconAlignment: IconAlignment.start,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (mapNameController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: const Text("กรุณากรอกชื่อสวน"),
-                          ));
-                          return;
-                        }
-
-                        context.read<MapProvider>().addProfile(
-                            selectedImage?.path ?? '',
-                            mapNameController.text,
-                            listPlotController
-                                .map((listPlot) => listPlot.text)
-                                .toList());
-                        Navigator.pop(context);
-                      },
-                      label: Text(
-                        'ยืนยัน',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.surface,
-                            ),
-                      ),
-                      icon: Icon(
-                        Icons.create,
-                        size: 28.sp,
-                      ),
-                    ),
-                  ),
-                )
               ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.only(bottom: 10.h, right: 20.w, left: 20.w),
+        child: SizedBox(
+          height: 60.h,
+          width: 380.w,
+          child: ElevatedButton.icon(
+            iconAlignment: IconAlignment.start,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () {
+              if (mapNameController.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: const Text("กรุณากรอกชื่อสวน"),
+                ));
+                return;
+              }
+
+              context.read<MapProvider>().addProfile(
+                  selectedImage?.path ?? '',
+                  mapNameController.text,
+                  listPlotController.map((listPlot) => listPlot.text).toList());
+              Navigator.pop(context);
+            },
+            label: Text(
+              'ยืนยัน',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+            ),
+            icon: Icon(
+              Icons.create,
+              size: 28.sp,
             ),
           ),
         ),

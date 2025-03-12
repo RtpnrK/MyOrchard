@@ -111,7 +111,14 @@ class _CreateActivityState extends State<CreateActivity> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> activitySet = context.watch<MapProvider>().list_profiles[widget.idMap-1].activitiesSet!;
+    List<String> activitySet = [
+      'อื่นๆ(ระบุ)',
+      'ใส่ปุ๋ย',
+      'รดน้ำ',
+      'ใส่ยา',
+      'พรวนดิน',
+      'ตัดหญ้า'
+    ];
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
@@ -193,8 +200,7 @@ class _CreateActivityState extends State<CreateActivity> {
                 ),
                 Card(
                   child: SizedBox(
-                    width: 380.w,
-                    
+                    width: 380.w,         
                     child: Padding(
                       padding: EdgeInsets.only(top: 15.h, bottom: 15.h),
                       child: SingleChildScrollView(
@@ -287,12 +293,12 @@ class _CreateActivityState extends State<CreateActivity> {
                                 items: List.generate(activitySet.length,
                                          (index) => DropdownMenuItem(
                                           child: Text(activitySet[index], style: Theme.of(context).textTheme.bodySmall,),
-                                          value: index,)),
+                                          value: activitySet[index],)),
                                 onChanged: (value) {
                                   setState(() {
-                                    activity = activitySet[value!];
+                                    activity = value!;
                                   });
-                                  if (value == 0) {
+                                  if (value == 'อื่นๆ(ระบุ)') {
                                     setState(() {
                                       other = true;
                                     });
@@ -450,7 +456,7 @@ class _CreateActivityState extends State<CreateActivity> {
                 onPressed: () {
                   if (other) {
                     setState(() {
-                      activity = activityController.text;
+                      activity = '(อื่นๆ) ${activityController.text}';
                     });
                   }
                   context.read<ActivityProvider>().addActivity(
@@ -460,6 +466,7 @@ class _CreateActivityState extends State<CreateActivity> {
                       activity,
                       date,
                       plotSelected,
+                      executorController.text,
                       widget.idMap);
                   context.read<ActivityProvider>().loadActivities(widget.idMap);
                   Navigator.pop(context);

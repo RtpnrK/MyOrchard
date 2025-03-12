@@ -42,6 +42,7 @@ class _ActivitiesState extends State<Activities> {
     return Scaffold(
       appBar: editMode
           ? AppBar(
+              toolbarHeight: 75.h,
               backgroundColor: Colors.transparent,
               scrolledUnderElevation: 0,
               leading: IconButton(

@@ -103,7 +103,7 @@ class _CalibrateState extends State<Calibrate> {
         ),
         backgroundColor: Colors.white,
         title: Text(
-          'ระบุตำแหน่ง',
+          'ปรับเทียบ',
           style: Theme.of(context).textTheme.headlineLarge,
         ),
         actions: [
@@ -240,7 +240,7 @@ class _CalibrateState extends State<Calibrate> {
                                             .displayMedium,
                                       ),
                                       Text(
-                                        'ระยะทางทั้งหมด: ${totalDistance.toStringAsFixed(2)} เมตร',
+                                        'ระยะทางทั้งหมด: ~ ${totalDistance.toStringAsFixed(0)} เมตร',
                                         style: Theme.of(context)
                                             .textTheme
                                             .displayMedium,
@@ -426,7 +426,7 @@ class _CalibrateState extends State<Calibrate> {
                               width: double.maxFinite,
                               child: Column(
                                 spacing: 20.h,
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
@@ -599,13 +599,20 @@ class _CalibrateState extends State<Calibrate> {
                                 color: pinList[idx].pinColor,
                                 size: pinSize,
                               ))),
-                      Positioned(
-                          left: myPosition.dx - (pinSize / 2),
-                          top: myPosition.dy - pinSize,
-                          child: Icon(
-                            Icons.man,
-                            size: pinSize,
-                          ))
+                       Visibility(
+                        visible: isCalibrate,
+                         child: AnimatedPositioned(
+                            left: myPosition.dx - (pinSize / 2),
+                            top: myPosition.dy - pinSize,
+                            duration: Duration(milliseconds: 800),
+                            child: Transform.rotate(
+                              angle: isCalibrate? position.heading*(pi/180): 0,
+                              child: Icon(
+                                Icons.navigation,
+                                size: pinSize,
+                              ),
+                            )),
+                       )
                     ],
                   ))),
           Visibility(
@@ -811,7 +818,7 @@ class _CalibrateState extends State<Calibrate> {
   void updateDistance() {
     double distance = 0;
     for (int i = 0; i < pinList.length - 1; i++) {
-      totalDistance += Geolocator.distanceBetween(
+      distance += Geolocator.distanceBetween(
           pinList[i].position.latitude,
           pinList[i].position.longitude,
           pinList[i + 1].position.latitude,
